@@ -1,6 +1,6 @@
 {
-  "name": "public-list",
-  "main": "public-list.html",
+  "name": "public-elements",
+  "main": "public-elements.html",
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.0"
   },

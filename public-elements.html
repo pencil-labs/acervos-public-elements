@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer-element.html">
 
-<dom-module id="public-list">
+<dom-module id="public-elements">
   <template>
     <style>
       :host {
@@ -12,25 +12,25 @@
 
   <script>
     /**
-     * `public-list`
+     * `public-elements`
      * 
      *
      * @customElement
      * @polymer
      * @demo demo/index.html
      */
-    class PublicList extends Polymer.Element {
-      static get is() { return 'public-list'; }
+    class PublicElements extends Polymer.Element {
+      static get is() { return 'public-elements'; }
       static get properties() {
         return {
           prop1: {
             type: String,
-            value: 'public-list'
+            value: 'public-elements'
           }
         };
       }
     }
 
-    window.customElements.define(PublicList.is, PublicList);
+    window.customElements.define(PublicElements.is, PublicElements);
   </script>
 </dom-module>
