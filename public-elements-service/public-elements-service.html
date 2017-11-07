@@ -1,5 +1,5 @@
-<link rel="import" href="../../polymer/polymer-element.html">
-<link rel="import" href="../../iron-ajax/iron-ajax.html">
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
 
 <!--
 The `public-elements-service` element exposes web API services.
@@ -48,7 +48,7 @@ element.
     </iron-ajax>
   </template>
   <script>
-    class PublicELementsService extends Polymer.Element {
+    class PublicElementsService extends Polymer.Element {
       static get is() { return 'public-elements-service'; }
       static get properties() {
         return {
@@ -118,7 +118,7 @@ element.
             type: String,
             value: 'GET'
           }
-          
+
         };
       }
 
@@ -137,6 +137,6 @@ element.
       }
 
     }
-    customElements.define(PublicELementsService.is, PublicELementsService);
+    customElements.define(PublicElementsService.is, PublicElementsService);
   </script>
 </dom-module>
