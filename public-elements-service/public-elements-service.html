@@ -1,5 +1,5 @@
-<link rel="import" href="../polymer/polymer-element.html">
-<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../../polymer/polymer-element.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
 
 <!--
 The `public-elements-service` element exposes web API services.
@@ -131,7 +131,6 @@ element.
       generateRequest() {
         var ajax = this;
         setTimeout( function() {
-          ajax._setHeaders();
           ajax.$.ajax.generateRequest();
         }, 100);
       }
