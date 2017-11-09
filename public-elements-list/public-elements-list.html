@@ -1,0 +1,42 @@
+<link rel="import" href="../polymer/polymer-element.html">
+
+<dom-module id="public-elements-list">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <section elevation="1" >
+      <h2>Registros</h2>
+    </section>
+
+    <div class="">
+
+    </div>
+  </template>
+
+  <script>
+    /**
+     * `public-elements-list`
+     *
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class PublicElementsList extends Polymer.Element {
+      static get is() { return 'public-elements-list'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'public-elements-list'
+          }
+        };
+      }
+    }
+
+    window.customElements.define(PublicElementsList.is, PublicElementsList);
+  </script>
+</dom-module>
