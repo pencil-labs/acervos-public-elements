@@ -1,0 +1,36 @@
+<link rel="import" href="../polymer/polymer-element.html">
+
+<dom-module id="public-elements-card">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]!</h2>
+  </template>
+
+  <script>
+    /**
+     * `public-elements-card`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class PublicElementsCard extends Polymer.Element {
+      static get is() { return 'public-elements-card'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'public-elements-card'
+          }
+        };
+      }
+    }
+
+    window.customElements.define(PublicElementsCard.is, PublicElementsCard);
+  </script>
+</dom-module>
