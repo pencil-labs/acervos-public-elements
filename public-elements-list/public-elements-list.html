@@ -1,21 +1,55 @@
-<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../../polymer/polymer-element.html">
+<link rel="import" href="../../paper-card/paper-card.html">
+<link rel="import" href="../../iron-image/iron-image.html">
+<link rel="import" href="../../paper-button/paper-button.html">
+
 
 <dom-module id="public-elements-list">
   <template>
     <style>
       :host {
         display: block;
+        position: relative;
       }
+      .results {
+        -moz-column-width: 14em;
+        -webkit-column-width: 14em;
+        column-width: 14em;
+        -moz-column-gap: 1em;
+        -webkit-column-gap: 1em;
+        column-gap: 1em;
+        padding: 10px;
+      }
+      paper-card {
+        display: inline-block;
+        width: 100%;
+        margin: 10px 0;
+      }
+      .item-header { @apply(--paper-font-headline); }
+      .item-light { color: var(--paper-grey-600); }
     </style>
-    <section elevation="1" >
-      <h2>Registros</h2>
-    </section>
-
-    <div class="">
-
+    <public-elements-service id="ajax"
+      service="{{service}}"  result="{{result}}" params="{{params}}"
+      method="{{method}}"  body="{{body}}" error="{{error}}">
+    </public-elements-service>
+    <div class="results">
+      <template is="dom-repeat" items="{{resultItems}}">
+        <paper-card image="{{}}">
+          <div class="card-content">
+            <div class="item-header">
+              {{item.term}}
+            </div>
+            <div class="item-light">
+              {{item.description}}
+            </div>
+          </div>
+          <div class="card-actions">
+            <paper-button on-tap="">abrir</paper-button>
+          </div>
+        </paper-card>
+      </template>
     </div>
   </template>
-
   <script>
     /**
      * `public-elements-list`
@@ -26,14 +60,36 @@
      * @demo demo/index.html
      */
     class PublicElementsList extends Polymer.Element {
-      static get is() { return 'public-elements-list'; }
+      static get is() {
+        return 'public-elements-list';
+      }
       static get properties() {
         return {
-          prop1: {
-            type: String,
-            value: 'public-elements-list'
+          project: {
+            type: Object,
+          },
+          resultItems: [],
+          service: {
+            value: `projects/59cabbdd4f1fc407201d1ffc/pubitems`,
+            observer: 'generateRequest'
+          },
+          result: {
+            observer: 'animateItems'
           }
         };
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+      }
+
+      animateItems(result) {
+        this.resultItems = result;
+      }
+
+      generateRequest() {
+        if (!this.service) return;
+        this.$.ajax.generateRequest();
       }
     }
 
