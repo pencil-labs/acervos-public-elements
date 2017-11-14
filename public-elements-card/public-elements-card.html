@@ -6,6 +6,8 @@
     <style>
       :host {
         display: block;
+        transition: opacity ease 0.35s;
+        opacity: 0;
       }
       paper-card {
         display: inline-block;
@@ -16,7 +18,7 @@
       .item-light { color: var(--paper-grey-600); }
     </style>
     <public-elements-service id="ajax"></public-elements-service>
-    <paper-card image="{{}}">
+    <paper-card image="{{_imagePath(cardItem)}}">
       <div class="card-content">
         <div class="item-header">
           {{cardItem.term}}
@@ -44,14 +46,28 @@
       static get is() { return 'public-elements-card'; }
       static get properties() {
         return {
-          cardItem: {
-            type: Object
+          cardItem: Object,
+          service: {
+            type: String,
+            value: 'projects/5a0b07ca7d421f096f6f3c93/pubmedia'
           }
         };
       }
 
       constructor() {
         super()
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        setTimeout(function() {
+          this.style.opacity = "1";
+        }.bind(this), 200);
+      }
+
+      _imagePath(cardItem) {
+        if(!cardItem || !cardItem._medias || !cardItem._medias.length) return;
+        return `${this.$.ajax.api}/${this.service}/${cardItem._item}/${cardItem._medias[0].filename}`;
       }
 
     }
