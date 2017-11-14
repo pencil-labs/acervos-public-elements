@@ -2,7 +2,7 @@
 <link rel="import" href="../../paper-card/paper-card.html">
 <link rel="import" href="../../iron-image/iron-image.html">
 <link rel="import" href="../../paper-button/paper-button.html">
-
+<link rel="import" href="../public-elements-card/public-elements-card.html">
 
 <dom-module id="public-elements-list">
   <template>
@@ -20,13 +20,6 @@
         column-gap: 1em;
         padding: 10px;
       }
-      paper-card {
-        display: inline-block;
-        width: 100%;
-        margin: 10px 0;
-      }
-      .item-header { @apply(--paper-font-headline); }
-      .item-light { color: var(--paper-grey-600); }
     </style>
     <public-elements-service id="ajax"
       service="{{service}}"  result="{{result}}" params="{{params}}"
@@ -34,19 +27,10 @@
     </public-elements-service>
     <div class="results">
       <template is="dom-repeat" items="{{resultItems}}">
-        <paper-card image="{{}}">
-          <div class="card-content">
-            <div class="item-header">
-              {{item.term}}
-            </div>
-            <div class="item-light">
-              {{item.description}}
-            </div>
-          </div>
-          <div class="card-actions">
-            <paper-button on-tap="">abrir</paper-button>
-          </div>
-        </paper-card>
+        <public-elements-card card-item="{{item}}"
+          on-show-item="presentShow"
+          on-edit-item="presentEditForm">
+        </public-elements-card>
       </template>
     </div>
   </template>
@@ -85,6 +69,7 @@
 
       animateItems(result) {
         this.resultItems = result;
+        console.log(result);
       }
 
       generateRequest() {

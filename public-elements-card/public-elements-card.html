@@ -1,4 +1,5 @@
-<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../../polymer/polymer-element.html">
+<link rel="import" href="../public-elements-service/public-elements-service.html">
 
 <dom-module id="public-elements-card">
   <template>
@@ -6,14 +7,34 @@
       :host {
         display: block;
       }
+      paper-card {
+        display: inline-block;
+        width: 100%;
+        margin: 10px 0;
+      }
+      .item-header { @apply(--paper-font-headline); }
+      .item-light { color: var(--paper-grey-600); }
     </style>
-    <h2>Hello [[prop1]]!</h2>
+    <public-elements-service id="ajax"></public-elements-service>
+    <paper-card image="{{}}">
+      <div class="card-content">
+        <div class="item-header">
+          {{cardItem.term}}
+        </div>
+        <div class="item-light">
+          {{cardItem.description}}
+        </div>
+      </div>
+      <div class="card-actions">
+        <paper-button on-tap="">abrir</paper-button>
+      </div>
+    </paper-card>
   </template>
 
   <script>
     /**
      * `public-elements-card`
-     * 
+     *
      *
      * @customElement
      * @polymer
@@ -23,12 +44,16 @@
       static get is() { return 'public-elements-card'; }
       static get properties() {
         return {
-          prop1: {
-            type: String,
-            value: 'public-elements-card'
+          cardItem: {
+            type: Object
           }
         };
       }
+
+      constructor() {
+        super()
+      }
+
     }
 
     window.customElements.define(PublicElementsCard.is, PublicElementsCard);
