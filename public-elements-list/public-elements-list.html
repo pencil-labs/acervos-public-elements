@@ -1,15 +1,16 @@
 <link rel="import" href="../../polymer/polymer-element.html">
-<link rel="import" href="../../paper-card/paper-card.html">
-<link rel="import" href="../../iron-image/iron-image.html">
-<link rel="import" href="../../paper-button/paper-button.html">
 <link rel="import" href="../public-elements-card/public-elements-card.html">
+<link rel="import" href="../public-elements-card-show/public-elements-card-show.html">
 
 <dom-module id="public-elements-list">
   <template>
     <style>
       :host {
         display: block;
-        position: relative;
+        position: absolute;
+        overflow: auto;
+        top: 0; left: 0;
+        right: 0; bottom: 0;
       }
       .results {
         -moz-column-width: 14em;
@@ -28,11 +29,11 @@
     <div class="results">
       <template is="dom-repeat" items="{{resultItems}}">
         <public-elements-card card-item="{{item}}"
-          on-show-item="presentShow"
-          on-edit-item="presentEditForm">
+          on-show-item="presentShow">
         </public-elements-card>
       </template>
     </div>
+    <public-elements-card-show id="show" on-dismiss-show="dismissShow"></public-elements-card-show>
   </template>
   <script>
     /**
@@ -74,6 +75,14 @@
       generateRequest() {
         if (!this.service) return;
         this.$.ajax.generateRequest();
+      }
+
+      presentShow(e) {
+        this.$.show.cardItem = e.detail.cardItem;
+      }
+
+      dismissShow(e) {
+        this.$.show.cardItem = undefined;
       }
     }
 
