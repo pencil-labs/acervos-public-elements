@@ -78,7 +78,7 @@
 
       computeService(projectId) {
         if (!projectId) return;
-        return `projects/${projectId}/pubitems`;
+        this.service = `projects/${projectId}/pubitems`;
       }
 
       animateItems(result) {
