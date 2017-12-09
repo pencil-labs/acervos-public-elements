@@ -22,7 +22,7 @@
         padding: 10px;
       }
     </style>
-    <public-elements-service id="ajax"
+    <public-elements-service id="ajax" api="{{server}}"
       service="{{service}}"  result="{{result}}" params="{{params}}"
       method="{{method}}"  body="{{body}}" error="{{error}}">
     </public-elements-service>
@@ -53,9 +53,17 @@
           project: {
             type: Object,
           },
+          projectId: {
+            type: String,
+            reflectToAttribute: true,
+            observer: 'computeService'
+          },
+          server: {
+            type: String,
+            value: ''
+          },
           resultItems: [],
           service: {
-            value: `projects/5a0b07ca7d421f096f6f3c93/pubitems`,
             observer: 'generateRequest'
           },
           result: {
@@ -66,6 +74,11 @@
 
       connectedCallback() {
         super.connectedCallback();
+      }
+
+      computeService(projectId) {
+        if (!projectId) return;
+        return `projects/${projectId}/pubitems`;
       }
 
       animateItems(result) {
