@@ -49,12 +49,15 @@
       static get is() { return 'public-elements-card'; }
       static get properties() {
         return {
+          projectId: String,
           cardItem: Object,
-          service: {
-            type: String,
-            value: 'projects/5a0b07ca7d421f096f6f3c93/pubmedia'
-          }
+          server: String,
+          mediaPath: String
         };
+      }
+
+      static get observers() {
+        return ['_mediaPath(projectId, service, cardItem)'];
       }
 
       constructor() {
@@ -74,9 +77,18 @@
         }));
       }
 
-      _imagePath(cardItem) {
-        if(!cardItem || !cardItem._medias || !cardItem._medias.length) return;
-        return `${this.$.ajax.api}/${this.service}/${cardItem._item}/${cardItem._medias[0].filename}`;
+      _imagePath(projectId, server, cardItem) {
+        if(!projectId || !server || !cardItem) return;
+        cardItem._medias = [];
+        cardItem._data.forEach((d) => {
+          if (d._medias) d._medias.forEach((m) => { cardItem._medias.push(m) });
+          if(d.term) this.set('cardItem.term', d.term);
+          if(d._item) this.set('cardItem._id', d._item);
+          if(d.description) this.set('cardItem.description', d.description);
+          if(d.regNumber) this.set('cardItem.register', d.regNumber);
+        });
+        if(!cardItem._medias.length) return;
+        return `${this.server}/projects/${projectId}/pubmedia/${cardItem._item}/${cardItem._medias[0].filename}`;
       }
 
     }

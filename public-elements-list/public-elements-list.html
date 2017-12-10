@@ -28,8 +28,8 @@
     </public-elements-service>
     <div class="results">
       <template is="dom-repeat" items="{{resultItems}}">
-        <public-elements-card card-item="{{item}}"
-          on-show-item="presentShow">
+        <public-elements-card card-item="{{item}}" server="{{server}}"
+          project-id="{{projectId}}" on-show-item="presentShow">
         </public-elements-card>
       </template>
     </div>
@@ -82,7 +82,7 @@
       }
 
       animateItems(result) {
-        this.resultItems = result;
+        this.resultItems = result.results;
       }
 
       generateRequest() {
