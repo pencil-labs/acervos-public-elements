@@ -93,8 +93,8 @@
       }
 
       _imagePath(cardItem) {
-        if(!cardItem || !cardItem._medias || !cardItem._medias.length) return;
-        return `${this.$.ajax.api}/${this.service}/${cardItem._item}/${cardItem._medias[0].filename}`;
+        if (!cardItem || !cardItem.image) return;
+        return cardItem.image;
       }
     }
 

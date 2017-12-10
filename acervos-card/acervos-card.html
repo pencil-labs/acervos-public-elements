@@ -91,6 +91,7 @@
         if(!this.cardItem._medias.length) return;
         this.mediaPath = `${server}/projects/${projectId}/pubmedia/${
           this.cardItem._id}/${this.cardItem._medias[0].filename}`;
+        this.set('cardItem.image', this.mediaPath);
       }
 
     }
