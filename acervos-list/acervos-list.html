@@ -80,7 +80,6 @@
         </dom-if>
       </div>
     </div>
-    <acervos-card-show id="show" on-dismiss-show="dismissShow"></acervos-card-show>
   </template>
   <script>
     /**
@@ -171,7 +170,8 @@
       }
 
       presentShow(e) {
-        this.$.show.cardItem = e.detail.cardItem;
+        this.dispatchEvent(new CustomEvent('show', { detail: { item: e.detail.cardItem },
+          bubbles: true, composed: true }));
       }
 
       dismissShow(e) {
