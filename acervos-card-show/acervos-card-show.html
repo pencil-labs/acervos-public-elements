@@ -1,5 +1,4 @@
 <link rel="import" href="../../polymer/polymer-element.html">
-<link rel="import" href="../../paper-card/paper-card.html">
 <link rel="import" href="../../iron-image/iron-image.html">
 <link rel="import" href="../../paper-button/paper-button.html">
 <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
@@ -18,15 +17,56 @@
         z-index: 999;
         overflow: auto;
       }
-      paper-card {
-        height: inherit;
-        width: inherit;
+      #card {
+        min-height: 100%;
+        min-width: 100%;
+        background: white;
       }
-      .show-header { @apply(--paper-font-headline); }
+      .image {
+        height: calc(100vh - 80px);
+      }
+      iron-image {
+        height: 100%;
+        width: 100%;
+      }
+      [middle-item] {
+        display: flex;
+        width: 100%;
+      }
+      .actions {
+        display: inline-block;
+        vertical-align: top;
+        padding: 5px 0;
+      }
+      .show-header {
+        display: inline-block;
+        margin: 0 30px;
+        font-family: Roboto;
+        font-weight: bold;
+        color: black;
+        font-size: 2.1rem;
+        line-height: 3.2rem;
+        flex: 1;
+        flex-grow: 1;
+      }
       .show-light { color: var(--paper-grey-600); }
     </style>
     <acervos-service id="ajax"></acervos-service>
-    <paper-card id="card" image="{{_imagePath(cardItem)}}">
+    <div id="card">
+      <app-toolbar>
+        <div middle-item>
+          <div class="actions">
+            <paper-icon-button icon="info-outline" on-tap="toggle"></paper-icon-button>
+          </div>
+          <div class="show-header">{{_setTitle(cardItem)}}</div>
+          <div class="actions">
+            <paper-icon-button icon="close" on-tap="dismiss"></paper-icon-button>
+          </div>
+        </div>
+      </app-toolbar>
+      <div class="image">
+        <iron-image src="{{_imagePath(cardItem)}}" sizing="contain"></iron-image>
+      </div>
       <div class="card-content">
         <div class="show-header">
           {{cardItem.term}}
@@ -37,8 +77,7 @@
       </div>
       <div class="card-actions">
       </div>
-      <paper-icon-button icon="close" on-tap="dismiss"></paper-icon-button>
-    </paper-card>
+    </div>
   </template>
 
   <script>
@@ -81,6 +120,7 @@
 
       dismiss() {
         this.style.opacity = '0';
+        this.cardItem = undefined;
         setTimeout(function() {
           this.style.display = 'none';
         }.bind(this), 400);
@@ -95,6 +135,16 @@
       _imagePath(cardItem) {
         if (!cardItem || !cardItem.image) return;
         return cardItem.image;
+      }
+
+      _setTitle(cardItem) {
+        if (!cardItem) return;
+        let name, term;
+        cardItem._data.forEach((data) => {
+          if (data.name) name = data.name;
+          if (data.term) term = data.term;
+        });
+        return name || term;
       }
     }
 
