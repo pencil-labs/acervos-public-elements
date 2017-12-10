@@ -21,7 +21,7 @@
       .item-light { color: var(--paper-grey-600); }
     </style>
     <public-elements-service id="ajax"></public-elements-service>
-    <paper-card image="{{_imagePath(cardItem)}}">
+    <paper-card image="{{mediaPath}}">
       <div class="card-content">
         <div class="item-header">
           {{cardItem.term}}
@@ -57,7 +57,7 @@
       }
 
       static get observers() {
-        return ['_mediaPath(projectId, service, cardItem)'];
+        return ['_mediaPath(projectId, server, cardItem)'];
       }
 
       constructor() {
@@ -77,18 +77,20 @@
         }));
       }
 
-      _imagePath(projectId, server, cardItem) {
+      _mediaPath(projectId, server, cardItem) {
         if(!projectId || !server || !cardItem) return;
-        cardItem._medias = [];
+        const _medias = [];
         cardItem._data.forEach((d) => {
-          if (d._medias) d._medias.forEach((m) => { cardItem._medias.push(m) });
+          if (d._medias) d._medias.forEach((m) => { _medias.push(m) });
           if(d.term) this.set('cardItem.term', d.term);
           if(d._item) this.set('cardItem._id', d._item);
           if(d.description) this.set('cardItem.description', d.description);
           if(d.regNumber) this.set('cardItem.register', d.regNumber);
         });
-        if(!cardItem._medias.length) return;
-        return `${this.server}/projects/${projectId}/pubmedia/${cardItem._item}/${cardItem._medias[0].filename}`;
+        this.set('cardItem._medias', _medias);
+        if(!this.cardItem._medias.length) return;
+        this.mediaPath = `${server}/projects/${projectId}/pubmedia/${
+          this.cardItem._id}/${this.cardItem._medias[0].filename}`;
       }
 
     }
