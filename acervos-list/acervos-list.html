@@ -11,43 +11,75 @@
       :host {
         --paper-spinner-color: #00a9eb;
         display: block;
-        position: absolute;
+        position: relative;
         overflow: auto;
-        top: 0; left: 0;
-        right: 0; bottom: 0;
+        height: 100%;
+      }
+      .show-less, .show-more {
+        text-align: center;
+        position: relative;
+        padding: 10px;
+      }
+      .results paper-icon-button {
+        color: var(--default-primary-color);
+        background: var(--primary-background-color);
+        border-radius: 50%;
+        padding: 5px;
+      }
+      .spinner {
+        text-align: center;
+        position: absolute;
+        left: 0;
+        right: 0;
+      }
+      .spinner paper-spinner {
+        background: var(--primary-background-color);
+        border-radius: 50%;
+        padding: 5px;
       }
       .results {
+        padding: 10px;
+      }
+      .results .list {
         -moz-column-width: 14em;
         -webkit-column-width: 14em;
         column-width: 14em;
         -moz-column-gap: 1em;
         -webkit-column-gap: 1em;
         column-gap: 1em;
-        padding: 10px;
       }
     </style>
     <acervos-service id="ajax" api="{{server}}" loading="{{loading}}"
       service="{{service}}"  result="{{result}}" params="{{params}}"
       method="{{method}}"  body="{{body}}" error="{{error}}">
     </acervos-service>
-    <dom-if if="{{loading}}">
-      <template>
-        <paper-spinner-lite active></paper-spinner-lite>
-      </template>
-    </dom-if>
-    <dom-if if="{{!loading}}">
-      <template>
-        <div class="results">
-          <dom-repeat items="{{resultItems}}">
-            <template>
-              <acervos-card card-item="{{item}}" server="{{server}}"
-                project-id="{{projectId}}" on-show-item="presentShow">
-              </acervos-card>
-            </template>
-          </dom-repeat>
-        </div>
-      </template>
-    </dom-if>
+    <div class="results" id="results">
+      <div class="list">
+        <dom-repeat items="{{resultItems}}">
+          <template>
+            <acervos-card card-item="{{item}}" server="{{server}}"
+              project-id="{{projectId}}" on-show-item="presentShow">
+            </acervos-card>
+          </template>
+        </dom-repeat>
+      </div>
+      <div class="show-more">
+        <dom-if if="{{loading}}">
+          <template>
+            <div class="spinner">
+              <paper-spinner elevation="1" active></paper-spinner>
+            </div>
+          </template>
+        </dom-if>
+        <dom-if if="{{!loading}}">
+          <template>
+            <paper-icon-button elevation="1"
+              on-tap="_loadMore" icon="expand-more">
+            </paper-icon-button>
+          </template>
+        </dom-if>
+      </div>
+    </div>
     <acervos-card-show id="show" on-dismiss-show="dismissShow"></acervos-card-show>
   </template>
   <script>
@@ -71,13 +103,15 @@
           projectId: {
             type: String,
             reflectToAttribute: true,
-            observer: 'computeService'
+            observer: 'projectChanged'
           },
           server: {
             type: String,
             value: ''
           },
-          resultItems: [],
+          resultItems: {
+            value() { return []; },
+          },
           service: {
             observer: 'generateRequest'
           },
@@ -87,21 +121,48 @@
           loading: {
             type: Boolean,
             value: false
+          },
+          more: {
+            type: Boolean,
+            value: false,
           }
         };
       }
 
       connectedCallback() {
         super.connectedCallback();
+        this.onscroll = function(e) {
+          const moreOffset = this.$.results.querySelector('.show-more').offsetTop;
+          const scrollTop  = e.target.scrollTop + e.target.clientHeight;
+          if(scrollTop >= moreOffset && !this.more) {
+            this._loadMore();
+          }
+        }.bind(this);
       }
 
-      computeService(projectId) {
+      computeService(projectId, more) {
+        this.service = undefined;
+
+        if (more) this.__skip = this.__skip  + 50 || 0;
+        let query = '';
+        if(this.__skip)
+          query = `?skip=${this.__skip}&limit=50`;
         if (!projectId) return;
-        this.service = `projects/${projectId}/pubitems`;
+        this.service = `projects/${projectId}/pubitems${query}`;
       }
 
       animateItems(result) {
-        this.resultItems = result.results;
+        if(!result.results.length) return;
+        this.resultItems = this.resultItems.concat(result.results);
+        this.set('more', false);
+      }
+
+      projectChanged(projectId) {
+        if(!projectId) return;
+        this.resultItems = [];
+        this.__skip = 0;
+        this.set('more', false);
+        this.computeService(projectId, this.more);
       }
 
       generateRequest() {
@@ -115,6 +176,12 @@
 
       dismissShow(e) {
         this.$.show.cardItem = undefined;
+      }
+
+      _loadMore(e) {
+        if(!this.resultItems.length) return;
+        this.set('more', true);
+        this.computeService(this.projectId, this.more);
       }
     }
 
