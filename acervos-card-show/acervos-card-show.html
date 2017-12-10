@@ -139,12 +139,7 @@
 
       _setTitle(cardItem) {
         if (!cardItem) return;
-        let name, term;
-        cardItem._data.forEach((data) => {
-          if (data.name) name = data.name;
-          if (data.term) term = data.term;
-        });
-        return name || term;
+        return cardItem.name || cardItem.term;
       }
     }
 

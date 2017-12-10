@@ -152,7 +152,9 @@
 
       animateItems(result) {
         if(!result.results.length) return;
-        this.resultItems = this.resultItems.concat(result.results);
+        this.resultItems = this.resultItems.concat(result.results.map((item) => {
+          return Object.assign({}, ...item._data);
+        }));
         this.set('more', false);
       }
 
