@@ -1,4 +1,7 @@
 <link rel="import" href="../../polymer/polymer-element.html">
+<link rel="import" href="../../polymer/lib/elements/dom-if.html">
+<link rel="import" href="../../polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../paper-spinner/paper-spinner-lite.html">
 <link rel="import" href="../acervos-card/acervos-card.html">
 <link rel="import" href="../acervos-card-show/acervos-card-show.html">
 
@@ -6,6 +9,7 @@
   <template>
     <style>
       :host {
+        --paper-spinner-color: #00a9eb;
         display: block;
         position: absolute;
         overflow: auto;
@@ -22,17 +26,28 @@
         padding: 10px;
       }
     </style>
-    <acervos-service id="ajax" api="{{server}}"
+    <acervos-service id="ajax" api="{{server}}" loading="{{loading}}"
       service="{{service}}"  result="{{result}}" params="{{params}}"
       method="{{method}}"  body="{{body}}" error="{{error}}">
     </acervos-service>
-    <div class="results">
-      <template is="dom-repeat" items="{{resultItems}}">
-        <acervos-card card-item="{{item}}" server="{{server}}"
-          project-id="{{projectId}}" on-show-item="presentShow">
-        </acervos-card>
+    <dom-if if="{{loading}}">
+      <template>
+        <paper-spinner-lite active></paper-spinner-lite>
       </template>
-    </div>
+    </dom-if>
+    <dom-if if="{{!loading}}">
+      <template>
+        <div class="results">
+          <dom-repeat items="{{resultItems}}">
+            <template>
+              <acervos-card card-item="{{item}}" server="{{server}}"
+                project-id="{{projectId}}" on-show-item="presentShow">
+              </acervos-card>
+            </template>
+          </dom-repeat>
+        </div>
+      </template>
+    </dom-if>
     <acervos-card-show id="show" on-dismiss-show="dismissShow"></acervos-card-show>
   </template>
   <script>
@@ -68,6 +83,10 @@
           },
           result: {
             observer: 'animateItems'
+          },
+          loading: {
+            type: Boolean,
+            value: false
           }
         };
       }
