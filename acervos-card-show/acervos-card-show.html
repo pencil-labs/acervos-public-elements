@@ -313,12 +313,12 @@
           case 'fullDate':
             let paths = date.fullDate.split('T')[0].split('-');
             return `${paths[2]}/${paths[1]}/${paths[0]}`;
-          case 'centimeter':
-            return frase + 'cm';
-          case 'meter':
-            return frase + 'm';
+          case 'decades':
+            return `${date.decades.from}-${date.decades.to}`;
+          case 'year':
+            return `${date.year}`;
           default:
-            return frase + 'cm';
+            return 'Não informado';
         }
       }
 
