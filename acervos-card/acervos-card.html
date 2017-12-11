@@ -16,6 +16,22 @@
         display: inline-block;
         width: 100%;
         margin: 10px 0;
+        position: relative;
+      }
+      .card-content {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        opacity: 0;
+        transition: opacity ease .35s;
+      }
+      paper-card:hover .card-content {
+        opacity: 1;
+      }
+      paper-icon-button {
+        border-radius: 50%;
+        color: white;
+        background: rgba(0,0,0,0.3);
       }
       .item-header { @apply(--paper-font-headline); }
       .item-light { color: var(--paper-grey-600); }
@@ -23,15 +39,7 @@
     <acervos-service id="ajax"></acervos-service>
     <paper-card image="{{mediaPath}}">
       <div class="card-content">
-        <div class="item-header">
-          {{cardItem.term}}
-        </div>
-        <div class="item-light">
-          {{cardItem.description}}
-        </div>
-      </div>
-      <div class="card-actions">
-        <paper-button on-tap="fireShowItem">abrir</paper-button>
+        <paper-icon-button icon="info" on-tap="fireShowItem"></paper-icon-button>
       </div>
     </paper-card>
   </template>
@@ -78,7 +86,8 @@
       }
 
       _mediaPath(projectId, server, cardItem) {
-        if(!projectId || !server || !cardItem) return;
+        if(!projectId || !server || !cardItem ||
+          !cardItem._medias || !cardItem._medias.length) return;
         this.mediaPath = `${server}/projects/${projectId}/pubmedia/${
           this.cardItem._item}/${this.cardItem._medias[0].filename}`;
         this.set('cardItem.image', this.mediaPath);

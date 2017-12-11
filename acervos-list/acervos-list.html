@@ -153,6 +153,12 @@
       animateItems(result) {
         if(!result.results.length) return;
         this.resultItems = this.resultItems.concat(result.results.map((item) => {
+          item._data.forEach((data) => {
+            if(data.__t === 'RelatedMedias') {
+              data._files = Array.from(data._medias);
+              delete data._medias;
+            }
+          });
           return Object.assign({}, ...item._data);
         }));
         this.set('more', false);

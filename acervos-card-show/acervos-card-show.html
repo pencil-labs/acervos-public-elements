@@ -1,5 +1,7 @@
 <link rel="import" href="../../polymer/polymer-element.html">
 <link rel="import" href="../../iron-image/iron-image.html">
+<link rel="import" href="../../app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../../app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../../paper-button/paper-button.html">
 <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../iron-icons/iron-icons.html">
@@ -16,11 +18,16 @@
         opacity: 0;
         z-index: 999;
         overflow: auto;
+        background: white;
       }
-      #card {
-        min-height: 100%;
+      app-toolbar {
+        z-index: 999;
+      }
+      #drawerLayout {
+        min-height: calc(100% - 64px);
         min-width: 100%;
         background: white;
+        --app-drawer-layout-content-transition: margin 0.2s;
       }
       .image {
         height: calc(100vh - 80px);
@@ -33,7 +40,7 @@
         display: flex;
         width: 100%;
       }
-      .actions {
+      .toolbar-buttons {
         display: inline-block;
         vertical-align: top;
         padding: 5px 0;
@@ -49,35 +56,111 @@
         flex: 1;
         flex-grow: 1;
       }
+      .container {
+        transition: ease .35s;
+      }
+      .drawer-content {
+        margin-top: 64px;
+        padding: 20px;
+        height: calc(100% - 64px);
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+      .toggle {
+        display: inline-block;
+        transition: transform ease .35s;
+        transform: translateX(0);
+      }
+      .toggle.hidden {
+        transform: translateX(-500px);
+      }
       .show-light { color: var(--paper-grey-600); }
+      #drawerLayout,
+      .drawer-content,
+      app-toolbar {
+        transition: ease .3s;
+      }
+      #drawerLayout.dark,
+      .drawer-content.dark,
+      app-toolbar.dark {
+        background: #333;
+      }
+      app-toolbar.dark paper-icon-button {
+        color: white;
+      }
     </style>
-    <acervos-service id="ajax"></acervos-service>
-    <div id="card">
-      <app-toolbar>
-        <div middle-item>
-          <div class="actions">
-            <paper-icon-button icon="info-outline" on-tap="toggle"></paper-icon-button>
+    <acervos-service id="ajax" api="{{server}}" service="{{service}}" result="{{result}}"></acervos-service>
+    <app-toolbar>
+      <div middle-item>
+        <div class="toolbar-buttons">
+          <paper-icon-button icon="info-outline" on-tap="toggle"
+            autofocus></paper-icon-button>
+        </div>
+        <div class="show-header"><span class="toggle">Informações</span></div>
+        <div class="toolbar-buttons">
+          <paper-icon-button icon="close" on-tap="dismiss"></paper-icon-button>
+        </div>
+      </div>
+    </app-toolbar>
+    <app-drawer-layout id="drawerLayout">
+      <app-drawer slot="drawer" id="drawer">
+        <div class="drawer-content">
+          <h3>Obra</h3>
+          <div class="show-light">
+            Título: {{_validate(cardItem.name)}}
           </div>
-          <div class="show-header">{{_setTitle(cardItem)}}</div>
-          <div class="actions">
-            <paper-icon-button icon="close" on-tap="dismiss"></paper-icon-button>
+          <div class="show-light">
+            Técnica: {{_validate(cardItem.technique)}}
+          </div>
+          <div class="show-light">
+            Dimensões: {{_unity(cardItem.dimensions)}}
+          </div>
+          <div class="show-light">
+            Local: {{_validate(cardItem.place)}}
+          </div>
+          <div class="show-light">
+            Data: {{_date(cardItem.date)}}
+          </div>
+          <h3>Descrição</h3>
+          <div class="show-light">
+            {{_validate(cardItem.description)}}
+          </div>
+          <h3>Midias</h3>
+          <div class="show-light">
+            <dom-repeat items="{{_medias(cardItem._files)}}">
+              <template>
+                <span><a href="{{_filepath(item)}}" target="_blanck">{{item.metadata.originalname}}</a></span>
+              </template>
+            </dom-repeat>
+            <dom-if if="{{noMedias}}">
+              <template>
+                Nenhuma midia anexada.
+              </template>
+            </dom-if>
+          </div>
+          <h3>Relacionados</h3>
+          <div class="show-light">
+            <dom-repeat items="{{_relatedItems(cardItem._registers)}}">
+              <template>
+                <paper-button on-tap="_requestItem">{{item}}</paper-button>
+              </template>
+            </dom-repeat>
+            <dom-if if="{{noRelated}}">
+              <template>
+                Nenhum item relacionado.
+              </template>
+            </dom-if>
           </div>
         </div>
-      </app-toolbar>
-      <div class="image">
-        <iron-image src="{{_imagePath(cardItem)}}" sizing="contain"></iron-image>
-      </div>
-      <div class="card-content">
-        <div class="show-header">
-          {{cardItem.term}}
+        <div class="card-toolbar-buttons">
         </div>
-        <div class="show-light">
-          {{cardItem.description}}
+      </app-drawer>
+      <div class="container">
+        <div class="image">
+          <iron-image src="{{cardItem.image}}" sizing="contain"></iron-image>
         </div>
       </div>
-      <div class="card-actions">
-      </div>
-    </div>
+    </app-drawer-layout>
   </template>
 
   <script>
@@ -101,9 +184,22 @@
           },
           service: {
             type: String,
-            value: 'projects/5a0b07ca7d421f096f6f3c93/pubmedia'
+            observer: 'serviceChanged'
+          },
+          projectId: {
+            value: '59801055c86b1e6a8bf6c36f'
+          },
+          server: {
+            value: 'http://localhost:4040/api'
+          },
+          result: {
+            observer: 'resultChanged'
           }
         };
+      }
+
+      static get observers() {
+        return ['_mediaPath(projectId, server, cardItem)'];
       }
 
       constructor() {
@@ -111,14 +207,27 @@
       }
 
       present() {
-        this.style.opacity = '0';
+        if(this.style.opacity === '1') return;
         this.style.display = 'block';
         setTimeout(function() {
           this.style.opacity = '1';
         }.bind(this), 200);
       }
 
-      dismiss() {
+      toggle(e) {
+        const drawerLayout = this.$.drawerLayout;
+        if (drawerLayout.forceNarrow || !drawerLayout.narrow) {
+          drawerLayout.forceNarrow = !drawerLayout.forceNarrow;
+        } else {
+          drawerLayout.drawer.toggle();
+        }
+        this.shadowRoot.querySelector('.toggle').classList.toggle('hidden');
+        this.shadowRoot.querySelector('app-toolbar').classList.toggle('dark');
+        this.shadowRoot.querySelector('.drawer-content').classList.toggle('dark');
+        drawerLayout.classList.toggle('dark');
+      }
+
+      dismiss(e) {
         this.style.opacity = '0';
         this.cardItem = undefined;
         setTimeout(function() {
@@ -131,16 +240,97 @@
         if(!cardItem) return;
         this.present();
       }
+      serviceChanged(service) {
+        if(!service) return;
+        this.$.ajax.generateRequest();
+      }
+
+      resultChanged(res) {
+        if(!res) return;
+        if(res._data.RelatedMedias) {
+          res._data.RelatedMedias._files = Array.from(res._data.RelatedMedias._medias);
+          delete res._data.RelatedMedias._medias;
+        }
+        this.cardItem = Object.assign({}, ...Object.values(res._data));
+      }
 
       _imagePath(cardItem) {
         if (!cardItem || !cardItem.image) return;
         return cardItem.image;
       }
 
-      _setTitle(cardItem) {
-        if (!cardItem) return;
-        return cardItem.name || cardItem.term;
+      _validate(prop) {
+        if (!prop) return 'Não informado';
+        return prop;
       }
+
+      _unity(dimensions) {
+        if(!dimensions) return 'Não informado.'
+        const frase = `${dimensions.width} x ${dimensions.height} `;
+        switch(dimensions.unity) {
+          case 'milimeter':
+            return frase + 'mm';
+          case 'centimeter':
+            return frase + 'cm';
+          case 'meter':
+            return frase + 'm';
+          default:
+            return frase + 'cm';
+        }
+      }
+
+      _date(date) {
+        if(!date || !date.dateType || !date[date.dateType]) return 'Não informado.'
+        switch(date.dateType) {
+          case 'fullDate':
+            let paths = date.fullDate.split('T')[0].split('-');
+            return `${paths[2]}/${paths[1]}/${paths[0]}`;
+          case 'centimeter':
+            return frase + 'cm';
+          case 'meter':
+            return frase + 'm';
+          default:
+            return frase + 'cm';
+        }
+      }
+
+      _medias(medias) {
+        if(!medias) {
+          this.noMedias = true;
+          return;
+        }
+        this.noMedias = false;
+        return medias;
+      }
+
+      _relatedItems(registers) {
+        if(!registers) {
+          this.noRelated = true;
+          return;
+        }
+        this.noRelated = false;
+        return registers.map((reg) => {
+          return `000${reg.split('-')[1]}`.slice(-4);
+        })
+      }
+
+      _filepath(item) {
+        return `${this.cardItem.image.match(/(.*\/)/)[0]}${item.filename}`;
+      }
+
+      _requestItem(event) {
+        const reg = event.model.get('item');
+        this.service = `${this.cardItem.image.match(/.*api\/(.*\/)pubmedia/)[1]}pubitems/${Number(reg)}`;
+      }
+
+      _mediaPath(projectId, server, cardItem) {
+        if(!projectId || !server || !cardItem ||
+          !cardItem._medias || !cardItem._medias.length) return;
+        this.mediaPath = `${server}/projects/${projectId}/pubmedia/${
+          this.cardItem._item}/${this.cardItem._medias[0].filename}`;
+        this.set('cardItem.image', this.mediaPath);
+      }
+
     }
 
     window.customElements.define(PublicElementsCardShow.is, PublicElementsCardShow);

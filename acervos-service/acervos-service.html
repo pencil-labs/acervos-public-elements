@@ -129,10 +129,7 @@ element.
       }
 
       generateRequest() {
-        var ajax = this;
-        setTimeout( function() {
-          ajax.$.ajax.generateRequest();
-        }, 100);
+        this.$.ajax.generateRequest();
       }
 
     }
