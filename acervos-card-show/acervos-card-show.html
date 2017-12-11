@@ -30,7 +30,7 @@
         --app-drawer-layout-content-transition: margin 0.2s;
       }
       .image {
-        height: calc(100vh - 80px);
+        height: calc(100vh - 120px);
       }
       iron-image {
         height: 100%;
@@ -61,10 +61,18 @@
       }
       .drawer-content {
         margin-top: 64px;
-        padding: 20px;
-        height: calc(100% - 64px);
+        padding: 0 20px;
+        height: calc(100% - 84px);
         overflow-y: auto;
         overflow-x: hidden;
+      }
+      .drawer-content .divider {
+        position: absolute;
+        right: 1px;
+        top: 280px;
+        height: 400px;
+        width: 1px;
+        background: #000;
       }
       .toggle {
         display: inline-block;
@@ -87,6 +95,18 @@
       }
       app-toolbar.dark paper-icon-button {
         color: white;
+      }
+      .navigate {
+        text-align: center;
+      }
+      .dark .navigate {
+        color: white;
+      }
+      span.media {
+        display: inline-block;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 200px;
       }
       @media screen and (max-width: 660px) {
         #drawerLayout,
@@ -115,6 +135,14 @@
         .show-header {
           font-size: 1.5rem;
         }
+        .navigate {
+          position: absolute;
+          bottom: 0;
+          color: white;
+          text-align: center;
+          left: 0;
+          right: 0;
+        }
       }
     </style>
     <acervos-service id="ajax" api="{{server}}" service="{{service}}" result="{{result}}"></acervos-service>
@@ -133,6 +161,7 @@
     <app-drawer-layout id="drawerLayout">
       <app-drawer slot="drawer" id="drawer">
         <div class="drawer-content">
+          <div class="divider"></div>
           <h3>Obra</h3>
           <div class="show-light">
             Título: {{_validate(cardItem.name)}}
@@ -157,7 +186,7 @@
           <div class="show-light">
             <dom-repeat items="{{_medias(cardItem._files)}}">
               <template>
-                <span><a href="{{_filepath(item)}}" target="_blanck">{{item.metadata.originalname}}</a></span>
+                <span class="media"><a href="{{_filepath(item)}}" target="_blanck">{{item.metadata.originalname}}</a></span>
               </template>
             </dom-repeat>
             <dom-if if="{{noMedias}}">
@@ -186,6 +215,9 @@
       <div class="container">
         <div class="image">
           <iron-image src="{{cardItem.image}}" sizing="contain"></iron-image>
+          <div class="navigate">
+          <paper-icon-button class="prev" icon="chevron-left" on-tap="prevImage"></paper-icon-button>
+          <paper-icon-button class="next" icon="chevron-right" on-tap="nextImage"></paper-icon-button>
         </div>
       </div>
     </app-drawer-layout>
@@ -222,12 +254,15 @@
           },
           result: {
             observer: 'resultChanged'
+          },
+          currentImage: {
+            value: 0
           }
         };
       }
 
       static get observers() {
-        return ['_mediaPath(projectId, server, cardItem)'];
+        return ['_mediaPath(projectId, server, cardItem, currentImage)'];
       }
 
       constructor() {
@@ -268,6 +303,7 @@
         if(!cardItem) return;
         this.present();
       }
+
       serviceChanged(service) {
         if(!service) return;
         this.$.ajax.generateRequest();
@@ -351,12 +387,20 @@
         this.service = `${this.cardItem.image.match(/.*api\/(.*\/)pubmedia/)[1]}pubitems/${Number(reg)}`;
       }
 
-      _mediaPath(projectId, server, cardItem) {
+      _mediaPath(projectId, server, cardItem, currentImage) {
         if(!projectId || !server || !cardItem ||
           !cardItem._medias || !cardItem._medias.length) return;
         this.mediaPath = `${server}/projects/${projectId}/pubmedia/${
-          this.cardItem._item}/${this.cardItem._medias[0].filename}`;
+          this.cardItem._item}/${this.cardItem._medias[currentImage].filename}`;
         this.set('cardItem.image', this.mediaPath);
+      }
+
+      prevImage(e) {
+        if(this.currentImage > 0) this.currentImage -= 1;
+      }
+
+      nextImage(e) {
+        if(this.currentImage < this.cardItem._medias.length - 1) this.currentImage += 1;
       }
 
     }
