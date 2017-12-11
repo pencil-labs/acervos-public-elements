@@ -88,6 +88,31 @@
       app-toolbar.dark paper-icon-button {
         color: white;
       }
+      @media screen and (max-width: 660px) {
+        #drawerLayout,
+        .drawer-content,
+        app-toolbar {
+          transition: ease .3s;
+          background: #333;
+        }
+        app-toolbar paper-icon-button {
+          color: white;
+        }
+        #drawerLayout.dark,
+        .drawer-content.dark,
+        app-toolbar.dark {
+          background: white;
+        }
+        app-toolbar.dark paper-icon-button {
+          color: black;
+        }
+        .toggle {
+          transform: translateX(-500px);
+        }
+        .toggle.hidden {
+          transform: translateX(0);
+        }
+      }
     </style>
     <acervos-service id="ajax" api="{{server}}" service="{{service}}" result="{{result}}"></acervos-service>
     <app-toolbar>
