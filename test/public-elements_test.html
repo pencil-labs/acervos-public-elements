@@ -4,36 +4,36 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
-    <title>public-elements test</title>
+    <title>acervos test</title>
 
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
 
-    <link rel="import" href="../public-elements.html">
+    <link rel="import" href="../acervos.html">
   </head>
   <body>
 
     <test-fixture id="BasicTestFixture">
       <template>
-        <public-elements></public-elements>
+        <acervos></acervos>
       </template>
     </test-fixture>
 
     <test-fixture id="ChangedPropertyTestFixture">
       <template>
-        <public-elements prop1="new-prop1"></public-elements>
+        <acervos prop1="new-prop1"></acervos>
       </template>
     </test-fixture>
 
     <script>
-      suite('public-elements', function() {
+      suite('acervos', function() {
 
         test('instantiating the element with default properties works', function() {
           var element = fixture('BasicTestFixture');
-          assert.equal(element.prop1, 'public-elements');
+          assert.equal(element.prop1, 'acervos');
           var elementShadowRoot = element.shadowRoot;
           var elementHeader = elementShadowRoot.querySelector('h2');
-          assert.equal(elementHeader.innerHTML, 'Hello public-elements!');
+          assert.equal(elementHeader.innerHTML, 'Hello acervos!');
         });
 
         test('setting a property on the element works', function() {

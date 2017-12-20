@@ -1,4 +1,4 @@
-# \<acervos\>
+# \<acervos-list\>
 
 
 

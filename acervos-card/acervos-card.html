@@ -1,0 +1,110 @@
+<link rel="import" href="../../polymer/polymer-element.html">
+<link rel="import" href="../../paper-card/paper-card.html">
+<link rel="import" href="../../iron-image/iron-image.html">
+<link rel="import" href="../../iron-icon/iron-icon.html">
+<link rel="import" href="../../paper-button/paper-button.html">
+<link rel="import" href="../acervos-service/acervos-service.html">
+
+<dom-module id="acervos-card">
+  <template>
+    <style>
+      :host {
+        display: block;
+        transition: opacity ease 0.35s;
+        opacity: 0;
+      }
+      paper-card {
+        display: inline-block;
+        width: 100%;
+        margin: 10px 0;
+        position: relative;
+      }
+      paper-card:hover .card-content {
+        opacity: 1;
+      }
+      .card-content {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        opacity: 0;
+        transition: opacity ease .35s;
+      }
+      iron-icon {
+        border-radius: 50%;
+        color: white;
+        background: rgba(0,0,0,0.3);
+      }
+      paper-button {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        color: white;
+      }
+      .item-header { @apply(--paper-font-headline); }
+      .item-light { color: var(--paper-grey-600); }
+    </style>
+    <acervos-service id="ajax"></acervos-service>
+    <paper-card image="{{mediaPath}}">
+      <div class="card-content">
+        <iron-icon icon="info"></iron-icon>
+      </div>
+      <paper-button class="overlay" on-tap="fireShowItem"></paper-button>
+    </paper-card>
+  </template>
+
+  <script>
+    /**
+     * `acervos-card`
+     *
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class AcervosCard extends Polymer.Element {
+      static get is() { return 'acervos-card'; }
+      static get properties() {
+        return {
+          projectId: String,
+          cardItem: Object,
+          server: String,
+          mediaPath: String
+        };
+      }
+
+      static get observers() {
+        return ['_mediaPath(projectId, server, cardItem)'];
+      }
+
+      constructor() {
+        super()
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        setTimeout(function() {
+          this.style.opacity = "1";
+        }.bind(this), 200);
+      }
+
+      fireShowItem(e) {
+        this.dispatchEvent(new CustomEvent('show-item', {
+          detail: { cardItem: this.cardItem }
+        }));
+      }
+
+      _mediaPath(projectId, server, cardItem) {
+        if(!projectId || !server || !cardItem ||
+          !cardItem._medias || !cardItem._medias.length) return;
+        this.mediaPath = `${server}/projects/${projectId}/pubmedia/${
+          this.cardItem._item}/${this.cardItem._medias[0].filename}`;
+        this.set('cardItem.image', this.mediaPath);
+      }
+
+    }
+
+    window.customElements.define(AcervosCard.is, AcervosCard);
+  </script>
+</dom-module>
