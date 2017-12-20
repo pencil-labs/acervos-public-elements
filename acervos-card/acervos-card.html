@@ -100,7 +100,7 @@
           !cardItem._medias || !cardItem._medias.length) return;
         this.mediaPath = `${server}/projects/${projectId}/pubmedia/${
           this.cardItem._item}/${this.cardItem._medias[0].filename}`;
-        this.set('cardItem.image', this.mediaPath);
+        if(this.mediaPath) this.set('cardItem.image', this.mediaPath);
       }
 
     }
