@@ -5,16 +5,18 @@
 <link rel="import" href="../../paper-button/paper-button.html">
 <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../iron-icons/iron-icons.html">
+<link rel="import" href="../../iron-icons/av-icons.html">
 
 <dom-module id="acervos-card-show">
   <template>
     <style>
       :host {
+        --app-drawer-width: 300px;
         display: none;
         position: absolute;
         left: 0; right: 0;
         top: 0; bottom: 0;
-        transition: opacity ease 0.35s;
+        transition: ease 0.35s;
         opacity: 0;
         z-index: 999;
         overflow: auto;
@@ -27,10 +29,14 @@
         min-height: calc(100% - 64px);
         min-width: 100%;
         background: white;
-        --app-drawer-layout-content-transition: margin 0.2s;
+        --app-drawer-layout-content-transition: margin 0.3s;
       }
       .image {
         height: calc(100vh - 120px);
+        position: relative;
+        margin: 0 10px;
+        top: 0;
+        transition: ease .3s;
       }
       iron-image {
         height: 100%;
@@ -57,11 +63,11 @@
         flex-grow: 1;
       }
       .container {
-        transition: ease .35s;
+        transition: ease .3s;
       }
       .drawer-content {
         margin-top: 64px;
-        padding: 0 20px;
+        padding: 0 20px 20px;
         height: calc(100% - 84px);
         overflow-y: auto;
         overflow-x: hidden;
@@ -75,12 +81,14 @@
         background: #000;
       }
       .toggle {
-        display: inline-block;
-        transition: transform ease .35s;
+        transition: transform ease .3s;
         transform: translateX(0);
       }
+      .close.large-btn {
+        display: none;
+      }
       .toggle.hidden {
-        transform: translateX(-500px);
+        transform: translateX(-100vw);
       }
       .show-light { color: var(--paper-grey-600); }
       #drawerLayout,
@@ -93,11 +101,23 @@
       app-toolbar.dark {
         background: #333;
       }
-      app-toolbar.dark paper-icon-button {
-        color: white;
+      #drawerLayout.dark .image {
+        height: calc(100vh - 60px);
+        top: -60px;
+      }
+      app-toolbar.dark {
+        background: transparent !important;
       }
       .navigate {
         text-align: center;
+      }
+      .navigate .item {
+        padding: 12px;
+        height: 36px;
+        width: 30px;
+      }
+      .navigate .item.selected {
+        padding: 9px;
       }
       .dark .navigate {
         color: white;
@@ -108,58 +128,88 @@
         overflow: hidden;
         max-width: 200px;
       }
+      .large-btn {
+        display: inline-block;
+      }
+      .small-btn {
+        display: none;
+      }
       @media screen and (max-width: 660px) {
-        #drawerLayout,
+        :host {
+          background: #333 !important;
+        }
+        .close.large-btn {
+          display: inline-block;
+        }
         .drawer-content,
         app-toolbar {
           transition: ease .3s;
-          background: #333;
+          background: transparent;
         }
         app-toolbar paper-icon-button {
-          color: white;
+          color: black;
         }
-        #drawerLayout.dark,
-        .drawer-content.dark,
-        app-toolbar.dark {
+        #drawerLayout,
+        #drawerLayout.dark {
+          background: #333;
+        }
+        #drawerLayout.dark .image {
+          height: calc(100vh - 120px);
+          top: 0;
+        }
+        .drawer-content.dark {
           background: white;
         }
         app-toolbar.dark paper-icon-button {
-          color: black;
+          color: white;
         }
         .toggle {
-          transform: translateX(-500px);
+          transform: translateX(0);
         }
         .toggle.hidden {
           transform: translateX(0);
+        }
+        .toggle .show-header {
+          color: black;
+        }
+        .toggle.hidden .show-header {
+          color: white;
         }
         .show-header {
           font-size: 1.5rem;
         }
         .navigate {
           position: absolute;
-          bottom: 0;
           color: white;
-          text-align: center;
           left: 0;
           right: 0;
+        }
+        .large-btn {
+          display: none;
+        }
+        .small-btn {
+          display: inline-block;
         }
       }
     </style>
     <acervos-service id="ajax" api="{{server}}" service="{{service}}" result="{{result}}"></acervos-service>
     <app-toolbar>
-      <div middle-item>
+      <div middle-item class="toggle">
         <div class="toolbar-buttons">
-          <paper-icon-button icon="info-outline" on-tap="toggle"
-            autofocus></paper-icon-button>
+          <paper-icon-button class="large-btn"  icon="close"
+            on-tap="dismiss"></paper-icon-button>
+          <paper-icon-button class="small-btn" icon="info"
+            on-tap="toggle"></paper-icon-button>
         </div>
-        <div class="show-header"><span class="toggle">Informações</span></div>
+        <div class="show-header"><span>Informações</span></div>
         <div class="toolbar-buttons">
-          <paper-icon-button icon="close" on-tap="dismiss"></paper-icon-button>
+          <paper-icon-button class="close small-btn" icon="close"
+            on-tap="dismiss"></paper-icon-button>
         </div>
       </div>
     </app-toolbar>
     <app-drawer-layout id="drawerLayout">
-      <app-drawer slot="drawer" id="drawer">
+      <app-drawer slot="drawer" id="drawer" on-opened-changed="toggleColors">
         <div class="drawer-content">
           <div class="divider"></div>
           <h3>Obra</h3>
@@ -216,8 +266,18 @@
         <div class="image">
           <iron-image src="{{cardItem.image}}" sizing="contain"></iron-image>
           <div class="navigate">
-          <paper-icon-button class="prev" icon="chevron-left" on-tap="prevImage"></paper-icon-button>
-          <paper-icon-button class="next" icon="chevron-right" on-tap="nextImage"></paper-icon-button>
+            <paper-icon-button class="prev" icon="chevron-left" on-tap="prevImage"></paper-icon-button>
+            <dom-repeat items="{{cardItem._medias}}" as="media">
+              <template>
+                <paper-icon-button class="item" noink
+                  icon="av:fiber-manual-record" on-tap="thisImage">
+                </paper-icon-button>
+              </template>
+            </dom-repeat>
+            <paper-icon-button class="next" icon="chevron-right" on-tap="nextImage"></paper-icon-button>
+            <paper-icon-button class="zoom large-btn" icon="zoom-in" on-tap="toggle"
+            autofocus></paper-icon-button>
+          </div>
         </div>
       </div>
     </app-drawer-layout>
@@ -271,6 +331,7 @@
 
       present() {
         if(this.style.opacity === '1') return;
+        this.currentImage = 0;
         this.style.display = 'block';
         setTimeout(function() {
           this.style.opacity = '1';
@@ -284,10 +345,25 @@
         } else {
           drawerLayout.drawer.toggle();
         }
+      }
+
+      toggleColors(e) {
+        console.log(e.detail);
+        const drawerLayout = this.$.drawerLayout;
         this.shadowRoot.querySelector('.toggle').classList.toggle('hidden');
         this.shadowRoot.querySelector('app-toolbar').classList.toggle('dark');
-        this.shadowRoot.querySelector('.drawer-content').classList.toggle('dark');
         drawerLayout.classList.toggle('dark');
+        this.shadowRoot.querySelector('.drawer-content').classList.toggle('dark');
+        this.shadowRoot.querySelector('.close').classList.toggle('small-btn');
+        this.shadowRoot.querySelector('.close').classList.toggle('large-btn');
+        const zoom = this.shadowRoot.querySelector('.zoom');
+        if(zoom.icon === 'zoom-in') {
+          zoom.icon = 'zoom-out';
+          this.style.background = '#333';
+        } else {
+          zoom.icon = 'zoom-in';
+          this.style.background = '#fff';
+        }
       }
 
       dismiss(e) {
@@ -393,10 +469,22 @@
         this.mediaPath = `${server}/projects/${projectId}/pubmedia/${
           this.cardItem._item}/${this.cardItem._medias[currentImage].filename}`;
         this.set('cardItem.image', this.mediaPath);
+        Array.from(this.shadowRoot.querySelectorAll('.navigate .item')).forEach((item, index) => {
+          if(currentImage === index) {
+            item.classList.add('selected');
+          } else {
+            item.classList.remove('selected');
+          }
+        });
       }
 
       prevImage(e) {
         if(this.currentImage > 0) this.currentImage -= 1;
+      }
+
+      thisImage(e) {
+        const index = this.cardItem._medias.indexOf(e.model.get('media'));
+        this.currentImage = index;
       }
 
       nextImage(e) {
