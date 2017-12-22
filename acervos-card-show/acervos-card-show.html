@@ -232,7 +232,7 @@
           <div class="show-light">
             {{_validate(cardItem.description)}}
           </div>
-          <h3>Midias</h3>
+          <h3>Midias Relacionadas</h3>
           <div class="show-light">
             <dom-repeat items="{{_medias(cardItem._files)}}">
               <template>
@@ -245,7 +245,7 @@
               </template>
             </dom-if>
           </div>
-          <h3>Relacionados</h3>
+          <h3>Itens Relacionados</h3>
           <div class="show-light">
             <dom-repeat items="{{_relatedItems(cardItem._registers)}}">
               <template>
