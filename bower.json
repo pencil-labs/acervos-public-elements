@@ -7,7 +7,8 @@
     "paper-card": "PolymerElements/paper-card#^2.0.0",
     "paper-spinner": "PolymerElements/paper-spinner#^2.0.0",
     "paper-button": "PolymerElements/paper-button#^2.0.0",
-    "app-layout": "polymerelements/app-layout#^2.0"
+    "app-layout": "polymerelements/app-layout#^2.0",
+    "iron-image": "ArthurJahn/iron-image#3e6923b"
   },
   "devDependencies": {
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^2.0.0",

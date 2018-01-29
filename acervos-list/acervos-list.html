@@ -151,15 +151,13 @@
       }
 
       animateItems(result) {
-        if(!result.results.length) return;
+        if(!result || !result.results.length) return;
         this.resultItems = this.resultItems.concat(result.results.map((item) => {
-          item._data.forEach((data) => {
-            if(data.__t === 'RelatedMedias') {
-              data._files = Array.from(data._medias);
-              delete data._medias;
-            }
-          });
-          return Object.assign({}, ...item._data);
+          if(item._data.RelatedMedias) {
+            item._data.RelatedMedias._files = Array.from(item._data.RelatedMedias._medias);
+            delete item._data.RelatedMedias._medias;
+          }
+          return Object.assign({}, ...Object.values(item._data));
         }));
         this.set('more', false);
       }

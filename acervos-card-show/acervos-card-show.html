@@ -192,7 +192,8 @@
         }
       }
     </style>
-    <acervos-service id="ajax" api="{{server}}" service="{{service}}" result="{{result}}"></acervos-service>
+    <acervos-service id="ajax" api="{{server}}" service="{{service}}"
+      params="{{params}}" result="{{result}}"></acervos-service>
     <app-toolbar>
       <div middle-item class="toggle">
         <div class="toolbar-buttons">
@@ -247,9 +248,11 @@
           </div>
           <h3>Itens Relacionados</h3>
           <div class="show-light">
-            <dom-repeat items="{{_relatedItems(cardItem._registers)}}">
+            <dom-repeat items="{{relatedItems}}">
               <template>
-                <paper-button on-tap="_requestItem">{{item}}</paper-button>
+                <paper-button on-tap="changeItem">
+                  <img src="{{item.thumbnail}}"/>
+                </paper-button>
               </template>
             </dom-repeat>
             <dom-if if="{{noRelated}}">
@@ -312,6 +315,8 @@
           server: {
             value: 'http://localhost:4040/api'
           },
+          params: Object,
+          relatedItems: Array,
           result: {
             observer: 'resultChanged'
           },
@@ -330,8 +335,9 @@
       }
 
       present() {
-        if(this.style.opacity === '1') return;
+        
         this.currentImage = 0;
+        this._relatedItems(this.cardItem._registers);
         this.style.display = 'block';
         setTimeout(function() {
           this.style.opacity = '1';
@@ -386,11 +392,23 @@
 
       resultChanged(res) {
         if(!res) return;
-        if(res._data.RelatedMedias) {
-          res._data.RelatedMedias._files = Array.from(res._data.RelatedMedias._medias);
-          delete res._data.RelatedMedias._medias;
+        // case when result is a list of items
+        if (res.count) {
+          this.relatedItems = res.results.map((item) => {
+            if(item._data.RelatedMedias) {
+              item._data.RelatedMedias._files = Array.from(item._data.RelatedMedias._medias);
+              delete item._data.RelatedMedias._medias;
+            }
+            return Object.assign({}, ...Object.values(item._data));
+          });
+        } else if(res.register) {
+          console.log(res);
+          if(res._data.RelatedMedias) {
+            res._data.RelatedMedias._files = Array.from(res._data.RelatedMedias._medias);
+            delete res._data.RelatedMedias._medias;
+          }
+          this.cardItem = Object.assign({}, ...Object.values(res._data));
         }
-        this.cardItem = Object.assign({}, ...Object.values(res._data));
       }
 
       _imagePath(cardItem) {
@@ -448,18 +466,21 @@
           return;
         }
         this.noRelated = false;
-        return registers.map((reg) => {
-          return `000${reg.split('-')[1]}`.slice(-4);
-        })
+        const regs = registers.map((reg) => {
+          return Number(reg.split('-')[1]);
+        });
+        console.log(regs);
+        this.params = { filters: JSON.stringify({ _register: regs }) };
+        this.set('service', ``);
+        this.set('service', `projects/${this.projectId}/pubitems`);
       }
 
       _filepath(item) {
         return `${this.cardItem.image.match(/(.*\/)/)[0]}${item.filename}`;
       }
 
-      _requestItem(event) {
-        const reg = event.model.get('item');
-        this.service = `${this.cardItem.image.match(/.*api\/(.*\/)pubmedia/)[1]}pubitems/${Number(reg)}`;
+      changeItem(event) {
+        this.cardItem = event.model.get('item');
       }
 
       _mediaPath(projectId, server, cardItem, currentImage) {

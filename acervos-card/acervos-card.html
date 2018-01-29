@@ -42,11 +42,36 @@
         bottom: 0;
         color: white;
       }
+      .image, .thumbnail {
+        --iron-image-width: 100%;
+        width: 100%;
+        transition: opacity ease .35s;
+      }
+      [hidden] {
+        opacity: 0;
+        position: absolute;
+        top: 0;
+      }
+      .hide { overflow: hidden; }
+      .thumbnail {
+        filter: blur(5px);
+        margin-bottom: -5px;
+        transform: scale(1.1);
+      }
+      .image:not([hidden]) {
+        opacity: 1;
+        position: unset;
+      }
       .item-header { @apply(--paper-font-headline); }
       .item-light { color: var(--paper-grey-600); }
     </style>
     <acervos-service id="ajax"></acervos-service>
-    <paper-card image="{{mediaPath}}">
+    <paper-card>
+      <div class="hide">
+      <iron-image class="thumbnail" hidden="[[loaded]]"
+        src="{{_thumbnail(cardItem)}}"></iron-image>
+      </div>
+      <iron-image class="image" hidden="[[!loaded]]" loaded="{{loaded}}"  src="{{mediaPath}}"></iron-image>
       <div class="card-content">
         <iron-icon icon="info"></iron-icon>
       </div>
@@ -93,6 +118,11 @@
         this.dispatchEvent(new CustomEvent('show-item', {
           detail: { cardItem: this.cardItem }
         }));
+      }
+
+      _thumbnail(cardItem) {
+        if(!cardItem) return;
+        return cardItem.thumbnail;
       }
 
       _mediaPath(projectId, server, cardItem) {
