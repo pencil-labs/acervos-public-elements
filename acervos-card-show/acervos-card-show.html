@@ -3,6 +3,7 @@
 <link rel="import" href="../../app-layout/app-drawer-layout/app-drawer-layout.html">
 <link rel="import" href="../../app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../../paper-button/paper-button.html">
+<link rel="import" href="../../paper-spinner/paper-spinner-lite.html">
 <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../iron-icons/iron-icons.html">
 <link rel="import" href="../../iron-icons/av-icons.html">
@@ -71,6 +72,7 @@
         height: calc(100% - 84px);
         overflow-y: auto;
         overflow-x: hidden;
+        transition: opacity ease .35s;
       }
       .drawer-content .divider {
         position: absolute;
@@ -102,7 +104,7 @@
         background: #333;
       }
       #drawerLayout.dark .image {
-        height: calc(100vh - 60px);
+        height: calc(100vh - 70px);
         top: -60px;
       }
       app-toolbar.dark {
@@ -133,6 +135,15 @@
       }
       .small-btn {
         display: none;
+      }
+      #imgSpinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        --paper-spinner-color: black;
+      }
+      .dark #imgSpinner {
+        --paper-spinner-color: white;
       }
       @media screen and (max-width: 660px) {
         :host {
@@ -267,7 +278,11 @@
       </app-drawer>
       <div class="data-wrapper">
         <div class="image">
-          <iron-image src="{{cardItem.image}}" sizing="contain"></iron-image>
+          <iron-image src="{{cardItem.image}}" sizing="contain"
+            loaded="{{imgLoaded}}">
+          </iron-image>
+          <paper-spinner-lite id="imgSpinner" alt="Carregando imagem"
+            active style="display:none;"></paper-spinner-lite>
           <div class="navigate">
             <paper-icon-button class="prev" icon="chevron-left" on-tap="prevImage"></paper-icon-button>
             <dom-repeat items="{{cardItem._medias}}" as="media">
@@ -322,6 +337,9 @@
           },
           currentImage: {
             value: 0
+          },
+          imgLoaded: {
+            observer: 'imageLoaded'
           }
         };
       }
@@ -335,7 +353,6 @@
       }
 
       present() {
-        
         this.currentImage = 0;
         this._relatedItems(this.cardItem._registers);
         this.style.display = 'block';
@@ -382,7 +399,12 @@
 
       showCard(cardItem) {
         if(!cardItem) return;
+        const content = this.shadowRoot.querySelector('.drawer-content');
+        content.style.opacity = '0';
         this.present();
+        setTimeout(() => {
+          content.style.opacity = '1';
+        }, 650);
       }
 
       serviceChanged(service) {
@@ -462,6 +484,7 @@
 
       _relatedItems(registers) {
         if(!registers) {
+          this.relatedItems = [];
           this.noRelated = true;
           return;
         }
@@ -481,6 +504,11 @@
 
       changeItem(event) {
         this.cardItem = event.model.get('item');
+      }
+
+      imageLoaded(loaded) {
+        if (loaded) this.$.imgSpinner.style.display = 'none';
+        else this.$.imgSpinner.style.display = 'block';
       }
 
       _mediaPath(projectId, server, cardItem, currentImage) {

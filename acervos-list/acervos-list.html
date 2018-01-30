@@ -2,6 +2,7 @@
 <link rel="import" href="../../polymer/lib/elements/dom-if.html">
 <link rel="import" href="../../polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../../paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="../../grain-masonry/grain-masonry.html">
 <link rel="import" href="../acervos-card/acervos-card.html">
 <link rel="import" href="../acervos-card-show/acervos-card-show.html">
 
@@ -48,13 +49,42 @@
         -webkit-column-gap: 1.2em;
         column-gap: 1.2em;
       }
+      acervos-card {
+        display: inline-block;
+        width: calc(25% - 20px);
+        margin: 20px 10px 0;
+      }
+      grain-masonry {
+        width: calc(100% + 20px);
+        margin-left: -10px;
+      }
+      @media screen and (max-width: 1201px) {
+        acervos-card {
+          width: calc(33.333333333% - 20px);
+        }
+      }
+      @media screen and (max-width: 961px) {
+        acervos-card {
+          width: calc(50% - 20px);
+        }
+      }
+      @media screen and (min-width: 641px) and (max-width: 718px) {
+        acervos-card {
+          width: calc(100% - 20px);
+        }
+      }
+      @media screen and (max-width: 480px) {
+        acervos-card {
+          width: calc(100% - 20px);
+        }
+      }
     </style>
     <acervos-service id="ajax" api="{{server}}" loading="{{loading}}"
       service="{{service}}"  result="{{result}}" params="{{params}}"
       method="{{method}}"  body="{{body}}" error="{{error}}">
     </acervos-service>
     <div class="results" id="results">
-      <div class="list">
+      <grain-masonry id="msnry" transition-duration="0" item-selector="acervos-card">
         <dom-repeat items="{{resultItems}}">
           <template>
             <acervos-card card-item="{{item}}" server="{{server}}"
@@ -62,12 +92,12 @@
             </acervos-card>
           </template>
         </dom-repeat>
-      </div>
+      </grain-masonry>
       <div class="show-more">
         <dom-if if="{{loading}}">
           <template>
             <div class="spinner">
-              <paper-spinner elevation="1" active></paper-spinner>
+              <paper-spinner-lite elevation="1" active></paper-spinner-lite>
             </div>
           </template>
         </dom-if>
@@ -152,13 +182,13 @@
 
       animateItems(result) {
         if(!result || !result.results.length) return;
-        this.resultItems = this.resultItems.concat(result.results.map((item) => {
+        this.resultItems = [...result.results.map((item) => {
           if(item._data.RelatedMedias) {
             item._data.RelatedMedias._files = Array.from(item._data.RelatedMedias._medias);
             delete item._data.RelatedMedias._medias;
           }
           return Object.assign({}, ...Object.values(item._data));
-        }));
+        }).reverse(), ...this.resultItems];
         this.set('more', false);
       }
 
@@ -168,6 +198,10 @@
         this.__skip = 0;
         this.set('more', false);
         this.computeService(projectId, this.more);
+      }
+
+      layout() {
+        this.$.msnry.layout();
       }
 
       generateRequest() {
