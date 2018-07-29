@@ -24,15 +24,21 @@
       }
       .card-content {
         position: absolute;
-        right: 0;
         bottom: 0;
         opacity: 0;
+        right: 0;
+        left: 0;
         transition: opacity ease .35s;
+        background: rgba(0,0,0,0.7);
+        color: white;
       }
       iron-icon {
         border-radius: 50%;
         color: white;
         background: rgba(0,0,0,0.3);
+        position: absolute;
+        right: 16px;
+        bottom: 16px;
       }
       paper-button {
         position: absolute;
@@ -65,6 +71,13 @@
       }
       .item-header { @apply(--paper-font-headline); }
       .item-light { color: var(--paper-grey-600); }
+      .card-content h3 {
+        margin: 0;
+        font-weight: bold;
+      }
+      .description-row {
+        font-size: 14px;
+      }
     </style>
     <acervos-service id="ajax"></acervos-service>
     <paper-card>
@@ -74,7 +87,16 @@
       </div>
       <iron-image class="image" hidden="[[!loaded]]" loaded="{{loaded}}"  src="{{mediaPath}}"></iron-image>
       <div class="card-content">
-        <iron-icon icon="info"></iron-icon>
+        <h3>{{cardItem.name}}</h3>
+        <div class="description-row">
+          <span>{{cardItem.technique}}</span>
+          <span>{{cardItem.dimensions.height}} X {{cardItem.dimensions.width}}</span>
+        </div>
+        <div class="description-row">
+          <span>{{cardItem.place}}</span>
+          <span>{{_cardDate(cardItem)}}</span>
+        </div>
+        <!-- <iron-icon icon="info"></iron-icon> -->
       </div>
       <paper-button class="overlay" on-tap="fireShowItem"></paper-button>
     </paper-card>
@@ -124,6 +146,19 @@
       _thumbnail(cardItem) {
         if(!cardItem) return;
         return cardItem.thumbnail;
+      }
+
+      _cardDate(cardItem) {
+        if(!cardItem || !cardItem.date) return;
+        console.log(cardItem.date);
+        switch(cardItem.date.dateType) {
+          case "decades":
+            return `${cardItem.date.decades.from} - ${cardItem.date.decades.to}`;
+            break;
+          case "year":
+            return `${cardItem.date.year}`;
+            break;
+        }
       }
 
       _mediaPath(projectId, server, cardItem) {
