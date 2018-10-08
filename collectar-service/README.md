@@ -1,4 +1,4 @@
-# \<collectar\>
+# \<collectar-service\>
 
 
 

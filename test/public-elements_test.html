@@ -4,36 +4,36 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
-    <title>acervos test</title>
+    <title>collectar test</title>
 
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
 
-    <link rel="import" href="../acervos.html">
+    <link rel="import" href="../collectar.html">
   </head>
   <body>
 
     <test-fixture id="BasicTestFixture">
       <template>
-        <acervos></acervos>
+        <collectar></collectar>
       </template>
     </test-fixture>
 
     <test-fixture id="ChangedPropertyTestFixture">
       <template>
-        <acervos prop1="new-prop1"></acervos>
+        <collectar prop1="new-prop1"></collectar>
       </template>
     </test-fixture>
 
     <script>
-      suite('acervos', function() {
+      suite('collectar', function() {
 
         test('instantiating the element with default properties works', function() {
           var element = fixture('BasicTestFixture');
-          assert.equal(element.prop1, 'acervos');
+          assert.equal(element.prop1, 'collectar');
           var elementShadowRoot = element.shadowRoot;
           var elementHeader = elementShadowRoot.querySelector('h2');
-          assert.equal(elementHeader.innerHTML, 'Hello acervos!');
+          assert.equal(elementHeader.innerHTML, 'Hello collectar!');
         });
 
         test('setting a property on the element works', function() {

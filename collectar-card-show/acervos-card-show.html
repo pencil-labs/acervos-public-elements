@@ -1,0 +1,546 @@
+<link rel="import" href="../../polymer/polymer-element.html">
+<link rel="import" href="../../iron-image/iron-image.html">
+<link rel="import" href="../../app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../../app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../../paper-button/paper-button.html">
+<link rel="import" href="../../paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="../../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../iron-icons/iron-icons.html">
+<link rel="import" href="../../iron-icons/av-icons.html">
+
+<dom-module id="collectar-card-show">
+  <template>
+    <style>
+      :host {
+        --app-drawer-width: 300px;
+        display: none;
+        position: absolute;
+        left: 0; right: 0;
+        top: 0; bottom: 0;
+        transition: ease 0.35s;
+        opacity: 0;
+        z-index: 999;
+        overflow: auto;
+        background: white;
+      }
+      app-toolbar {
+        z-index: 999;
+      }
+      #drawerLayout {
+        min-height: calc(100% - 64px);
+        min-width: 100%;
+        background: white;
+        --app-drawer-layout-content-transition: margin 0.3s;
+      }
+      .image {
+        height: calc(100vh - 120px);
+        position: relative;
+        margin: 0 10px;
+        top: 0;
+        transition: ease .3s;
+      }
+      iron-image {
+        height: 100%;
+        width: 100%;
+      }
+      [middle-item] {
+        display: flex;
+        width: 100%;
+      }
+      .toolbar-buttons {
+        display: inline-block;
+        vertical-align: top;
+        padding: 5px 0;
+      }
+      .show-header {
+        display: inline-block;
+        margin: 0 30px;
+        font-family: Roboto;
+        font-weight: bold;
+        color: black;
+        font-size: 2.1rem;
+        line-height: 3.2rem;
+        flex: 1;
+        flex-grow: 1;
+      }
+      .data-wrapper {
+        transition: ease .3s;
+      }
+      .drawer-content {
+        margin-top: 64px;
+        padding: 0 20px 20px;
+        height: calc(100% - 84px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        transition: opacity ease .35s;
+      }
+      .drawer-content .divider {
+        position: absolute;
+        right: 1px;
+        top: 280px;
+        height: 400px;
+        width: 1px;
+        background: #000;
+      }
+      .toggle {
+        transition: transform ease .3s;
+        transform: translateX(0);
+      }
+      .close.large-btn {
+        display: none;
+      }
+      .toggle.hidden {
+        transform: translateX(-100vw);
+      }
+      .show-light { color: var(--paper-grey-600); }
+      #drawerLayout,
+      .drawer-content,
+      app-toolbar {
+        transition: ease .3s;
+      }
+      #drawerLayout.dark,
+      .drawer-content.dark,
+      app-toolbar.dark {
+        background: #333;
+      }
+      #drawerLayout.dark .image {
+        height: calc(100vh - 70px);
+        top: -60px;
+      }
+      app-toolbar.dark {
+        background: transparent !important;
+      }
+      .navigate {
+        text-align: center;
+      }
+      .navigate .item {
+        padding: 12px;
+        height: 36px;
+        width: 30px;
+      }
+      .navigate .item.selected {
+        padding: 9px;
+      }
+      .dark .navigate {
+        color: white;
+      }
+      span.media {
+        display: inline-block;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 200px;
+      }
+      .large-btn {
+        display: inline-block;
+      }
+      .small-btn {
+        display: none;
+      }
+      #imgSpinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        --paper-spinner-color: black;
+      }
+      .dark #imgSpinner {
+        --paper-spinner-color: white;
+      }
+      @media screen and (max-width: 660px) {
+        :host {
+          background: #333 !important;
+        }
+        .close.large-btn {
+          display: inline-block;
+        }
+        .drawer-content,
+        app-toolbar {
+          transition: ease .3s;
+          background: transparent;
+        }
+        app-toolbar paper-icon-button {
+          color: black;
+        }
+        #drawerLayout,
+        #drawerLayout.dark {
+          background: #333;
+        }
+        #drawerLayout.dark .image {
+          height: calc(100vh - 120px);
+          top: 0;
+        }
+        .drawer-content.dark {
+          background: white;
+        }
+        app-toolbar.dark paper-icon-button {
+          color: white;
+        }
+        .toggle {
+          transform: translateX(0);
+        }
+        .toggle.hidden {
+          transform: translateX(0);
+        }
+        .toggle .show-header {
+          color: black;
+        }
+        .toggle.hidden .show-header {
+          color: white;
+        }
+        .show-header {
+          font-size: 1.5rem;
+        }
+        .navigate {
+          position: absolute;
+          color: white;
+          left: 0;
+          right: 0;
+        }
+        .large-btn {
+          display: none;
+        }
+        .small-btn {
+          display: inline-block;
+        }
+      }
+    </style>
+    <collectar-service id="ajax" api="{{server}}" service="{{service}}"
+      params="{{params}}" result="{{result}}"></collectar-service>
+    <app-toolbar>
+      <div middle-item class="toggle">
+        <div class="toolbar-buttons">
+          <paper-icon-button class="large-btn"  icon="close"
+            on-tap="dismiss"></paper-icon-button>
+          <paper-icon-button class="small-btn" icon="info"
+            on-tap="toggle"></paper-icon-button>
+        </div>
+        <div class="show-header"><span>Informações</span></div>
+        <div class="toolbar-buttons">
+          <paper-icon-button class="close small-btn" icon="close"
+            on-tap="dismiss"></paper-icon-button>
+        </div>
+      </div>
+    </app-toolbar>
+    <app-drawer-layout id="drawerLayout">
+      <app-drawer slot="drawer" id="drawer" on-opened-changed="toggleColors">
+        <div class="drawer-content">
+          <div class="divider"></div>
+          <h3>Obra</h3>
+          <div class="show-light">
+            Título: {{_validate(cardItem.name)}}
+          </div>
+          <div class="show-light">
+            Técnica: {{_validate(cardItem.technique)}}
+          </div>
+          <div class="show-light">
+            Dimensões: {{_unity(cardItem.dimensions)}}
+          </div>
+          <div class="show-light">
+            Local: {{_validate(cardItem.place)}}
+          </div>
+          <div class="show-light">
+            Data: {{_date(cardItem.date)}}
+          </div>
+          <h3>Descrição</h3>
+          <div class="show-light">
+            {{_validate(cardItem.description)}}
+          </div>
+          <h3>Midias Relacionadas</h3>
+          <div class="show-light">
+            <dom-repeat items="{{_medias(cardItem._files)}}">
+              <template>
+                <span class="media"><a href="{{_filepath(item)}}" target="_blanck">{{item.metadata.originalname}}</a></span>
+              </template>
+            </dom-repeat>
+            <dom-if if="{{noMedias}}">
+              <template>
+                Nenhuma midia anexada.
+              </template>
+            </dom-if>
+          </div>
+          <h3>Itens Relacionados</h3>
+          <div class="show-light">
+            <dom-repeat items="{{relatedItems}}">
+              <template>
+                <paper-button on-tap="changeItem">
+                  <img src="{{item.thumbnail}}"/>
+                </paper-button>
+              </template>
+            </dom-repeat>
+            <dom-if if="{{noRelated}}">
+              <template>
+                Nenhum item relacionado.
+              </template>
+            </dom-if>
+          </div>
+        </div>
+        <div class="card-toolbar-buttons">
+        </div>
+      </app-drawer>
+      <div class="data-wrapper">
+        <div class="image">
+          <iron-image src="{{cardItem.image}}" sizing="contain"
+            loaded="{{imgLoaded}}">
+          </iron-image>
+          <paper-spinner-lite id="imgSpinner" alt="Carregando imagem"
+            active style="display:none;"></paper-spinner-lite>
+          <div class="navigate">
+            <paper-icon-button class="prev" icon="chevron-left" on-tap="prevImage"></paper-icon-button>
+            <dom-repeat items="{{cardItem._medias}}" as="media">
+              <template>
+                <paper-icon-button class="item" noink
+                  icon="av:fiber-manual-record" on-tap="thisImage">
+                </paper-icon-button>
+              </template>
+            </dom-repeat>
+            <paper-icon-button class="next" icon="chevron-right" on-tap="nextImage"></paper-icon-button>
+            <paper-icon-button class="zoom large-btn" icon="zoom-in" on-tap="toggle"
+            autofocus></paper-icon-button>
+          </div>
+        </div>
+      </div>
+    </app-drawer-layout>
+  </template>
+
+  <script>
+    /**
+     * `collectar-card-show`
+     *
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class PublicElementsCardShow extends Polymer.Element {
+      static get is() {
+        return 'collectar-card-show';
+      }
+      static get properties() {
+        return {
+          cardItem: {
+            type: Object,
+            observer: 'showCard'
+          },
+          service: {
+            type: String,
+            observer: 'serviceChanged'
+          },
+          projectId: {
+            value: '59801055c86b1e6a8bf6c36f'
+          },
+          server: {
+            value: 'http://localhost:4040/api'
+          },
+          params: Object,
+          relatedItems: Array,
+          result: {
+            observer: 'resultChanged'
+          },
+          currentImage: {
+            value: 0
+          },
+          imgLoaded: {
+            observer: 'imageLoaded'
+          }
+        };
+      }
+
+      static get observers() {
+        return ['_mediaPath(projectId, server, cardItem, currentImage)'];
+      }
+
+      constructor() {
+        super()
+      }
+
+      present() {
+        this.currentImage = 0;
+        this._relatedItems(this.cardItem._registers);
+        this.style.display = 'block';
+        setTimeout(function() {
+          this.style.opacity = '1';
+        }.bind(this), 200);
+      }
+
+      toggle(e) {
+        const drawerLayout = this.$.drawerLayout;
+        if (drawerLayout.forceNarrow || !drawerLayout.narrow) {
+          drawerLayout.forceNarrow = !drawerLayout.forceNarrow;
+        } else {
+          drawerLayout.drawer.toggle();
+        }
+      }
+
+      toggleColors(e) {
+        const drawerLayout = this.$.drawerLayout;
+        this.shadowRoot.querySelector('.toggle').classList.toggle('hidden');
+        this.shadowRoot.querySelector('app-toolbar').classList.toggle('dark');
+        drawerLayout.classList.toggle('dark');
+        this.shadowRoot.querySelector('.drawer-content').classList.toggle('dark');
+        this.shadowRoot.querySelector('.close').classList.toggle('small-btn');
+        this.shadowRoot.querySelector('.close').classList.toggle('large-btn');
+        const zoom = this.shadowRoot.querySelector('.zoom');
+        if(zoom.icon === 'zoom-in') {
+          zoom.icon = 'zoom-out';
+          this.style.background = '#333';
+        } else {
+          zoom.icon = 'zoom-in';
+          this.style.background = '#fff';
+        }
+      }
+
+      dismiss(e) {
+        this.style.opacity = '0';
+        this.cardItem = undefined;
+        setTimeout(function() {
+          this.style.display = 'none';
+        }.bind(this), 400);
+        this.dispatchEvent(new CustomEvent('dismiss-show'));
+      }
+
+      showCard(cardItem) {
+        if(!cardItem) return;
+        const content = this.shadowRoot.querySelector('.drawer-content');
+        content.style.opacity = '0';
+        this.present();
+        setTimeout(() => {
+          content.style.opacity = '1';
+        }, 650);
+      }
+
+      serviceChanged(service) {
+        if(!service) return;
+        this.$.ajax.generateRequest();
+      }
+
+      resultChanged(res) {
+        if(!res) return;
+        // case when result is a list of items
+        if (res.count) {
+          this.relatedItems = res.results.map((item) => {
+            if(item._data.RelatedMedias) {
+              item._data.RelatedMedias._files = Array.from(item._data.RelatedMedias._medias);
+              delete item._data.RelatedMedias._medias;
+            }
+            return Object.assign({}, ...Object.values(item._data));
+          });
+        } else if(res.register) {
+          console.log(res);
+          if(res._data.RelatedMedias) {
+            res._data.RelatedMedias._files = Array.from(res._data.RelatedMedias._medias);
+            delete res._data.RelatedMedias._medias;
+          }
+          this.cardItem = Object.assign({}, ...Object.values(res._data));
+        }
+      }
+
+      _imagePath(cardItem) {
+        if (!cardItem || !cardItem.image) return;
+        return cardItem.image;
+      }
+
+      _validate(prop) {
+        if (!prop) return 'Não informado';
+        return prop;
+      }
+
+      _unity(dimensions) {
+        if(!dimensions) return 'Não informado.'
+        const frase = `${dimensions.width} x ${dimensions.height} `;
+        switch(dimensions.unity) {
+          case 'milimeter':
+            return frase + 'mm';
+          case 'centimeter':
+            return frase + 'cm';
+          case 'meter':
+            return frase + 'm';
+          default:
+            return frase + 'cm';
+        }
+      }
+
+      _date(date) {
+        if(!date || !date.dateType || !date[date.dateType]) return 'Não informado.'
+        switch(date.dateType) {
+          case 'fullDate':
+            let paths = date.fullDate.split('T')[0].split('-');
+            return `${paths[2]}/${paths[1]}/${paths[0]}`;
+          case 'decades':
+            return `${date.decades.from}-${date.decades.to}`;
+          case 'year':
+            return `${date.year}`;
+          default:
+            return 'Não informado';
+        }
+      }
+
+      _medias(medias) {
+        if(!medias) {
+          this.noMedias = true;
+          return;
+        }
+        this.noMedias = false;
+        return medias;
+      }
+
+      _relatedItems(registers) {
+        if(!registers) {
+          this.relatedItems = [];
+          this.noRelated = true;
+          return;
+        }
+        this.noRelated = false;
+        const regs = registers.map((reg) => {
+          return Number(reg.split('-')[1]);
+        });
+        console.log(regs);
+        this.params = { filters: JSON.stringify({ _register: regs }) };
+        this.set('service', ``);
+        this.set('service', `projects/${this.projectId}/pubitems`);
+      }
+
+      _filepath(item) {
+        return `${this.cardItem.image.match(/(.*\/)/)[0]}${item.filename}`;
+      }
+
+      changeItem(event) {
+        this.cardItem = event.model.get('item');
+      }
+
+      imageLoaded(loaded) {
+        if (loaded) this.$.imgSpinner.style.display = 'none';
+        else this.$.imgSpinner.style.display = 'block';
+      }
+
+      _mediaPath(projectId, server, cardItem, currentImage) {
+        if(!projectId || !server || !cardItem ||
+          !cardItem._medias || !cardItem._medias.length) return;
+        this.mediaPath = `${server}/projects/${projectId}/pubmedia/${
+          this.cardItem._item}/${this.cardItem._medias[currentImage].filename}`;
+        this.set('cardItem.image', this.mediaPath);
+        Array.from(this.shadowRoot.querySelectorAll('.navigate .item')).forEach((item, index) => {
+          if(currentImage === index) {
+            item.classList.add('selected');
+          } else {
+            item.classList.remove('selected');
+          }
+        });
+      }
+
+      prevImage(e) {
+        if(this.currentImage > 0) this.currentImage -= 1;
+      }
+
+      thisImage(e) {
+        const index = this.cardItem._medias.indexOf(e.model.get('media'));
+        this.currentImage = index;
+      }
+
+      nextImage(e) {
+        if(this.currentImage < this.cardItem._medias.length - 1) this.currentImage += 1;
+      }
+
+    }
+
+    window.customElements.define(PublicElementsCardShow.is, PublicElementsCardShow);
+  </script>
+</dom-module>
