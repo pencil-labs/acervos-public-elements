@@ -1,0 +1,36 @@
+<link rel="import" href="../polymer/polymer-element.html">
+
+<dom-module id="collectar-search">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]!</h2>
+  </template>
+
+  <script>
+    /**
+     * `collectar-search`
+     * Collectar full search bar with advanced fields and text search
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class CollectarSearch extends Polymer.Element {
+      static get is() { return 'collectar-search'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'collectar-search'
+          }
+        };
+      }
+    }
+
+    window.customElements.define(CollectarSearch.is, CollectarSearch);
+  </script>
+</dom-module>
