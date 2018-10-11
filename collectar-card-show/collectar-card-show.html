@@ -6,7 +6,7 @@
 <link rel="import" href="../../paper-spinner/paper-spinner-lite.html">
 <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../iron-icons/iron-icons.html">
-<link rel="import" href="../../iron-icons/av-icons.html">
+<link rel="import" href="../collectar-icons/collectar-icons.html">
 
 <dom-module id="collectar-card-show">
   <template>
@@ -208,14 +208,14 @@
     <app-toolbar>
       <div middle-item class="toggle">
         <div class="toolbar-buttons">
-          <paper-icon-button class="large-btn"  icon="close"
+          <paper-icon-button class="large-btn"  icon="app:close"
             on-tap="dismiss"></paper-icon-button>
-          <paper-icon-button class="small-btn" icon="info"
+          <paper-icon-button class="small-btn" icon="app:info"
             on-tap="toggle"></paper-icon-button>
         </div>
         <div class="show-header"><span>Informações</span></div>
         <div class="toolbar-buttons">
-          <paper-icon-button class="close small-btn" icon="close"
+          <paper-icon-button class="close small-btn" icon="app:close"
             on-tap="dismiss"></paper-icon-button>
         </div>
       </div>
@@ -284,16 +284,16 @@
           <paper-spinner-lite id="imgSpinner" alt="Carregando imagem"
             active style="display:none;"></paper-spinner-lite>
           <div class="navigate">
-            <paper-icon-button class="prev" icon="chevron-left" on-tap="prevImage"></paper-icon-button>
+            <paper-icon-button class="prev" icon="app:chevron-left" on-tap="prevImage"></paper-icon-button>
             <dom-repeat items="{{cardItem._medias}}" as="media">
               <template>
                 <paper-icon-button class="item" noink
-                  icon="av:fiber-manual-record" on-tap="thisImage">
+                  icon="app:fiber-manual-record" on-tap="thisImage">
                 </paper-icon-button>
               </template>
             </dom-repeat>
-            <paper-icon-button class="next" icon="chevron-right" on-tap="nextImage"></paper-icon-button>
-            <paper-icon-button class="zoom large-btn" icon="zoom-in" on-tap="toggle"
+            <paper-icon-button class="next" icon="app:chevron-right" on-tap="nextImage"></paper-icon-button>
+            <paper-icon-button class="zoom large-btn" icon="app:zoom-in" on-tap="toggle"
             autofocus></paper-icon-button>
           </div>
         </div>
@@ -379,11 +379,11 @@
         this.shadowRoot.querySelector('.close').classList.toggle('small-btn');
         this.shadowRoot.querySelector('.close').classList.toggle('large-btn');
         const zoom = this.shadowRoot.querySelector('.zoom');
-        if(zoom.icon === 'zoom-in') {
-          zoom.icon = 'zoom-out';
+        if(zoom.icon === 'app:zoom-in') {
+          zoom.icon = 'app:zoom-out';
           this.style.background = '#333';
         } else {
-          zoom.icon = 'zoom-in';
+          zoom.icon = 'app:zoom-in';
           this.style.background = '#fff';
         }
       }
@@ -514,8 +514,8 @@
       _mediaPath(projectId, server, cardItem, currentImage) {
         if(!projectId || !server || !cardItem ||
           !cardItem._medias || !cardItem._medias.length) return;
-        this.mediaPath = `${server}/projects/${projectId}/pubmedia/${
-          this.cardItem._item}/${this.cardItem._medias[currentImage].filename}`;
+        this.mediaPath = `${server}/projects/${projectId}/medias/${
+          this.cardItem._item}/${this.cardItem._medias[currentImage].filename}?size=1500`;
         this.set('cardItem.image', this.mediaPath);
         Array.from(this.shadowRoot.querySelectorAll('.navigate .item')).forEach((item, index) => {
           if(currentImage === index) {

@@ -80,7 +80,7 @@
       }
     </style>
     <collectar-service id="ajax"></collectar-service>
-    <paper-card>
+    <paper-card elevation="0">
       <div class="hide">
       <iron-image class="thumbnail" hidden="[[loaded]]"
         src="{{_thumbnail(cardItem)}}"></iron-image>
@@ -89,11 +89,18 @@
       <div class="card-content">
         <h3>{{cardItem.name}}</h3>
         <div class="description-row">
-          <span>{{cardItem.technique}}</span>
-          <span>{{cardItem.dimensions.height}} X {{cardItem.dimensions.width}}</span>
+          <dom-if if="{{cardItem._taxonomy}}">
+            <template>
+              <span>{{cardItem._taxonomy.name}}</span>
+            </template>
+          </dom-if>
+          <dom-if if="{{cardItem.dimensions.width}}">
+            <template>
+              <span>{{cardItem.dimensions.height}} X {{cardItem.dimensions.width}}</span>
+            </template>
+          </dom-if>
         </div>
         <div class="description-row">
-          <span>{{cardItem.place}}</span>
           <span>{{_cardDate(cardItem)}}</span>
         </div>
         <!-- <iron-icon icon="info"></iron-icon> -->
@@ -106,7 +113,6 @@
     /**
      * `collectar-card`
      *
-     *
      * @customElement
      * @polymer
      * @demo demo/index.html
@@ -118,7 +124,8 @@
           projectId: String,
           cardItem: Object,
           server: String,
-          mediaPath: String
+          mediaPath: String,
+          enabledFields: String
         };
       }
 
@@ -126,21 +133,17 @@
         return ['_mediaPath(projectId, server, cardItem)'];
       }
 
-      constructor() {
-        super()
-      }
-
       connectedCallback() {
         super.connectedCallback();
         setTimeout(function() {
           this.style.opacity = "1";
-        }.bind(this), 200);
+        }.bind(this), 800);
       }
 
       fireShowItem(e) {
         this.dispatchEvent(new CustomEvent('show-item', {
-          detail: { cardItem: this.cardItem }
-        }));
+          detail: { cardItem: this.cardItem },
+          bubbles: true, composed: true }));
       }
 
       _thumbnail(cardItem) {
@@ -150,13 +153,17 @@
 
       _cardDate(cardItem) {
         if(!cardItem || !cardItem.date) return;
-        console.log(cardItem.date);
+        const d1 = new Date(cardItem.date.dates[0]);
+        const d2 = new Date(cardItem.date.dates[1]);
         switch(cardItem.date.dateType) {
           case "decades":
-            return `${cardItem.date.decades.from} - ${cardItem.date.decades.to}`;
+            return `${d1.getYear()} - ${d2.getYear()}`;
             break;
           case "year":
-            return `${cardItem.date.year}`;
+            return `${d1.getYear()}}`;
+            break;
+          case "fullDate":
+            return `${d1.getDate()}/${d1.getMonth()}/${d1.getFullYear()}`;
             break;
         }
       }
@@ -164,8 +171,8 @@
       _mediaPath(projectId, server, cardItem) {
         if(!projectId || !server || !cardItem ||
           !cardItem._medias || !cardItem._medias.length) return;
-        this.mediaPath = `${server}/projects/${projectId}/pubmedia/${
-          this.cardItem._item}/${this.cardItem._medias[0].filename}`;
+        this.mediaPath = `${server}/projects/${projectId}/medias/${
+          this.cardItem._item}/${this.cardItem._medias[0].filename}?size=400`;
         if(this.mediaPath) this.set('cardItem.image', this.mediaPath);
       }
 

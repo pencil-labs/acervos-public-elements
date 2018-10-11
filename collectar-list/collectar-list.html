@@ -13,13 +13,16 @@
         --paper-spinner-color: #00a9eb;
         display: block;
         position: relative;
-        overflow: auto;
+        overflow-x: hidden;
+        overflow-y: auto;
         height: 100%;
+        width: 100%;
       }
       .show-less, .show-more {
         text-align: center;
         position: relative;
         padding: 10px;
+        height: 40px;
       }
       .results paper-icon-button {
         color: var(--default-primary-color);
@@ -84,14 +87,7 @@
       method="{{method}}"  body="{{body}}" error="{{error}}">
     </collectar-service>
     <div class="results" id="results">
-      <grain-masonry id="msnry" transition-duration="0" item-selector="collectar-card">
-        <dom-repeat items="{{resultItems}}">
-          <template>
-            <collectar-card card-item="{{item}}" server="{{server}}"
-              project-id="{{projectId}}" on-show-item="presentShow">
-            </collectar-card>
-          </template>
-        </dom-repeat>
+      <grain-masonry id="masonry" transition-duration="250" item-selector="collectar-card">
       </grain-masonry>
       <div class="show-more">
         <dom-if if="{{loading}}">
@@ -101,7 +97,7 @@
             </div>
           </template>
         </dom-if>
-        <dom-if if="{{!loading}}">
+        <dom-if if="{{canShowMore(loading, limit)}}">
           <template>
             <paper-icon-button elevation="1"
               on-tap="_loadMore" icon="expand-more">
@@ -154,7 +150,8 @@
           more: {
             type: Boolean,
             value: false,
-          }
+          },
+          limit: Boolean
         };
       }
 
@@ -172,24 +169,33 @@
       computeService(projectId, more) {
         this.service = undefined;
 
-        if (more) this.__skip = this.__skip  + 50 || 0;
-        let query = '';
-        if(this.__skip)
-          query = `?skip=${this.__skip}&limit=50`;
+        if (more) this.__skip = this.__skip  + 10 || 0;
+        const query = `?skip=${this.__skip}&limit=10`;
         if (!projectId) return;
-        this.service = `projects/${projectId}/pubitems${query}`;
+        this.service = `projects/${projectId}/items${query}`;
       }
 
       animateItems(result) {
         if(!result || !result.results.length) return;
-        this.resultItems = [...result.results.map((item) => {
+        this.limit = false;
+        const resultItems = result.results.map((item) => {
           if(item._data.RelatedMedias) {
             item._data.RelatedMedias._files = Array.from(item._data.RelatedMedias._medias);
             delete item._data.RelatedMedias._medias;
           }
           return Object.assign({}, ...Object.values(item._data));
-        }).reverse(), ...this.resultItems];
-        this.set('more', false);
+        });
+          const cards = resultItems.map((i) => {
+            const card = document.createElement('collectar-card');
+            card.cardItem = i;
+            card.projectId = this.projectId;
+            card.server = this.server;
+            return card;
+          });
+          this.$.masonry.appendChildren(cards);
+          this.resultItems.push(...resultItems);
+          if(this.resultItems.length >= result.count) this.limit = true;
+          this.set('more', false);
       }
 
       projectChanged(projectId) {
@@ -201,7 +207,7 @@
       }
 
       layout() {
-        this.$.msnry.layout();
+        this.$.masonry.layout();
       }
 
       generateRequest() {
@@ -222,6 +228,9 @@
         if(!this.resultItems.length) return;
         this.set('more', true);
         this.computeService(this.projectId, this.more);
+      }
+      canShowMore(loading, limit) {
+        return !loading && !limit;
       }
     }
 
