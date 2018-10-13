@@ -177,7 +177,7 @@
         if(this.__skip)
           query = `?skip=${this.__skip}&limit=50`;
         if (!projectId) return;
-        this.service = `projects/${projectId}/pubitems${query}`;
+        this.service = `projects/${projectId}/items${query}`;
       }
 
       animateItems(result) {

@@ -1,13 +1,91 @@
 <link rel="import" href="../../polymer/polymer-element.html">
 
+<link rel="import" href="../collectar-service/collectar-service.html">
+
 <dom-module id="collectar-text-search">
   <template>
     <style>
       :host {
         display: block;
       }
+      .search-field {
+        display: flex;
+      }
+      .search-field paper-button {
+        font-size: 0.8rem;
+        padding: 5px 10px 5px 5px;
+        margin: 0;
+        border-radius: 0;
+        color: var(--default-primary-color);
+      }
+      .search-field input {
+        flex: 1;
+        font-size: 0.8rem;
+        height: 38px;
+        border: none;
+        background: #f2f2f2;
+        padding-left: 10px;
+      }
+      .search-field paper-icon-button.search {
+        position: absolute;
+        right: 25px;
+        opacity: 0.4;
+      }
+      .search-field input:focus {
+        outline: none;
+        padding-left: 10px;
+      }
+      .search-field input:focus::placeholder {
+        opacity: .8;
+      }
+      .search-field input::placeholder {
+        color: black;
+        opacity: .4;
+      }
+      .search-field input:focus + paper-icon-button.search {
+        opacity: 1;
+        color: var(--default-primary-color);
+      }
+      .taxonomies {
+        max-width: 60%;
+        background: #f2f2f2;
+        white-space: nowrap;
+        overflow: auto;
+      }
+      .taxonomies span {
+        font-size: 0.8rem;
+        display: inline-block;
+        padding: 5px;
+        background: white;
+        margin: 5px 2px;
+      }
+      .taxonomies span.highlight {
+        background: var(--pink-theme-color);
+          color: white;
+      }
     </style>
-    <h2>Hello [[prop1]]!</h2>
+    <collectar-service id="ajax" api="{{server}}" loading="{{loading}}"
+      service="{{service}}"  result="{{result}}" params="{{params}}"
+      method="{{method}}"  body="{{body}}" error="{{error}}">
+    </collectar-service>
+    <div class="search-field">
+      <div class="taxonomies">
+        <dom-repeat items="{{taxonomies}}">
+          <template>
+            <span class$="{{isHighlighted(item, removeCandidate)}}">
+              {{item.name}}
+            </span>
+          </template>
+        </dom-repeat>
+      </div>
+      <input id="input" placeholder="Buscar..." value="{{search::input}}">
+      <iron-a11y-keys target="[[target]]" keys="backspace"
+                    on-keys-pressed="onBackspace"></iron-a11y-keys>
+      <iron-a11y-keys target="[[target]]" keys="enter"
+                    on-keys-pressed="searchFor"></iron-a11y-keys>
+      <paper-icon-button class="search" icon="app:search" on-tap="searchFor">
+      </paper-icon-button>
+    </div>
   </template>
 
   <script>
@@ -23,12 +101,97 @@
       static get is() { return 'collectar-text-search'; }
       static get properties() {
         return {
-          prop1: {
+          search: {
             type: String,
-            value: 'collectar-text-search'
-          }
+            notify: true,
+            observer: 'searchTaxonomy'
+          },
+          result: {
+            type: Object,
+            observer: 'handleResult'
+          },
+          filter: {
+            type: Object,
+            notify: true
+          },
+          project: {
+            type: Object
+          },
+          taxonomies: {
+            type: Array,
+            notify: true,
+            value() { return []; }
+          },
+          uniqueElements: Array
         };
       }
+
+      connectedCallback() {
+        super.connectedCallback();
+        this.target = this.$.input;
+      }
+
+      searchTaxonomy(search) {
+        this.removeCandidate = undefined;
+        if(!search.includes(' ') || this.loading) return;
+        if(!this.filterResult) {
+          this.remoteFilter(search);
+        } else {
+          this.localFilter(search);
+        }
+      }
+
+      remoteFilter(search) {
+        this.service = `projects/${this.project._id}/taxonomies?search=${search}`;
+        this.$.ajax.generateRequest();
+      }
+
+      localFilter(search) {
+        if(!this.filterResult) return;
+        const reg = new RegExp(search.trim(), 'i');
+        const filter = this.filterResult.filter((tax) => reg.test(tax.name));
+        if (filter.length) {
+          this.filterResult = filter;
+          this.bestMatch = filter[0];
+        } else {
+          if (this.bestMatch && !this.taxonomies.map(i => i._id).includes(this.bestMatch._id)) {
+            this.push('taxonomies', this.bestMatch);
+            this.search = this.search.replace(/.* /, '');
+          }
+          this.filterResult = this.bestMatch = undefined;
+        }
+      }
+
+      handleResult(result) {
+        if (!result) return;
+        this.filterResult = result;
+        this.localFilter(this.search);
+      }
+
+      searchFor(e) {
+        this.dispatchEvent(new CustomEvent('search', { detail: {
+          search: this.search,
+          taxonomies: this.taxonomies
+        } }));
+      }
+
+      onBackspace(e) {
+        if(this.search || !this.taxonomies.length) return;
+        const lastIndex = this.taxonomies.length - 1;
+        if (this.removeCandidate) {
+          this.splice('taxonomies', lastIndex, 1);
+          this.removeCandidate = undefined;
+        } else {
+          this.removeCandidate = this.taxonomies[lastIndex];
+        }
+      }
+
+      isHighlighted(item, removeCandidate) {
+        if(!removeCandidate) return '';
+        if (item._id === removeCandidate._id) return 'highlight';
+        return '';
+      }
+
     }
 
     window.customElements.define(CollectarTextSearch.is, CollectarTextSearch);

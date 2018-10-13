@@ -164,7 +164,7 @@
       _mediaPath(projectId, server, cardItem) {
         if(!projectId || !server || !cardItem ||
           !cardItem._medias || !cardItem._medias.length) return;
-        this.mediaPath = `${server}/projects/${projectId}/pubmedia/${
+        this.mediaPath = `${server}/projects/${projectId}/medias/${
           this.cardItem._item}/${this.cardItem._medias[0].filename}`;
         if(this.mediaPath) this.set('cardItem.image', this.mediaPath);
       }

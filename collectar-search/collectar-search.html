@@ -1,13 +1,23 @@
 <link rel="import" href="../../polymer/polymer-element.html">
 
+<link rel="import" href="../collectar-text-search/collectar-text-search.html">
+
 <dom-module id="collectar-search">
   <template>
     <style>
       :host {
         display: block;
       }
+      .content {
+        padding: 20px;
+      }
     </style>
-    <h2>Hello [[prop1]]!</h2>
+    <div class="content">
+      <collectar-text-search id="textFilter" filter="{{filter}}" project="{{project}}"
+        unique-elements="{{uniqueElements}}" search="{{search}}"
+        taxonomies="{{taxonomies}}" on-search="submitFilters">
+      </collectar-text-search>
+    </div>
   </template>
 
   <script>
@@ -29,6 +39,11 @@
           }
         };
       }
+
+      submitFilters(e) {
+        console.log(e.detail);
+      }
+
     }
 
     window.customElements.define(CollectarSearch.is, CollectarSearch);
