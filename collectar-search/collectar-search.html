@@ -1,4 +1,7 @@
-<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../../polymer/polymer-element.html">
+
+<link rel="import" href="../collectar-text-search/collectar-text-search.html">
+<link rel="import" href="../collectar-service/collectar-service.html">
 
 <dom-module id="collectar-search">
   <template>
@@ -6,8 +9,20 @@
       :host {
         display: block;
       }
+      .content {
+        padding: 20px;
+      }
     </style>
-    <h2>Hello [[prop1]]!</h2>
+    <collectar-service id="ajax" api="{{server}}" loading="{{loading}}"
+      service="{{service}}" result="{{result}}" params="{{params}}"
+      method="{{method}}" body="{{body}}" error="{{error}}">
+    </collectar-service>
+    <div class="content">
+      <collectar-text-search id="textFilter" filter="{{filter}}" project-id="{{projectId}}"
+        unique-elements="{{uniqueElements}}" search="{{search}}" server="http://localhost:4040/api"
+        on-search="submitFilters">
+      </collectar-text-search>
+    </div>
   </template>
 
   <script>
@@ -23,12 +38,37 @@
       static get is() { return 'collectar-search'; }
       static get properties() {
         return {
-          prop1: {
+          projectId: {
             type: String,
-            value: 'collectar-search'
+            observer: 'projectChanged'
+          },
+          taxonomies: {
+            type: Array,
+            notify: true,
+            value() { return []; }
+          },
+          server: {
+            type: String,
+            value: ''
+          },
+          service: {
+            type: String
+          },
+          loading: {
+            type: Boolean,
+            value: false
           }
         };
       }
+
+      connectedCallback() {
+        super.connectedCallback();
+      }
+
+      submitFilters(e) {
+        console.log(e.detail);
+      }
+
     }
 
     window.customElements.define(CollectarSearch.is, CollectarSearch);
