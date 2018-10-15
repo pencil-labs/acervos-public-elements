@@ -8,13 +8,14 @@
   <template>
     <style>
       :host {
-        display: block;
+        display: none;
         position: absolute;
         top: 0;
         background: white;
-        overflow: auto;
+        overflow: hidden;
         padding: 0 20px;
         opacity: 0;
+        width: 100%;
         transition: opacity ease .35s;
       }
       h1 paper-icon-button {
@@ -24,6 +25,7 @@
       }
       .cover {
         height: 50vw;
+        max-height: 80vh;
         background-size: cover;
       }
     </style>
@@ -106,6 +108,7 @@
         if (!this.service) return;
         this.$.ajax.generateRequest();
       }
+      
       background(promote) {
         if(!promote) return;
         const media = promote._medias[0];
@@ -119,9 +122,21 @@
       }
 
       animate(promote) {
-        if(promote) this.style.opacity = '1';
-        else this.style.opacity = '0';
+        if(promote) {
+          this.style.display = 'block';
+          this.style.overflow = 'auto';
+          setTimeout(() => {
+            this.style.opacity = '1';
+          }, 10);
+        } else {
+          this.style.opacity = '0';
+          setTimeout(() => {
+            this.style.display = 'none';
+            this.style.overflow = 'hidden';
+          }, 350);
+        } 
       }
+
       dismiss(e) {
         this.promote = undefined;
       }
