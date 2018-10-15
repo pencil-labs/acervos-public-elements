@@ -13,6 +13,8 @@
       :host {
         display: block;
         position: relative;
+        max-width: 550px;
+        margin: 0 auto;
       }
       .search-field paper-button {
         font-size: 0.8rem;
@@ -61,7 +63,75 @@
         }
       }
     </style>
-    <h2>Hello [[prop1]]!</h2>
+    <collectar-service id="ajax" api="{{server}}" loading="{{loading}}"
+      service="{{service}}" result="{{result}}" params="{{params}}"
+      method="{{method}}" body="{{body}}" error="{{error}}">
+    </collectar-service>
+    <paper-tabs id="tabs" attr-for-selected="name"
+      selected="{{selected}}">
+      <paper-tab name="general" id="general">
+        Geral
+      </paper-tab>
+      <paper-tab name="dimensions" id="dimensions">
+        Dimensões
+      </paper-tab>
+      <dom-if if="{{isMobile}}">
+        <template>
+          <paper-tab id="more" name="more">
+            Mais
+          </paper-tab>
+        </template>
+      </dom-if>
+      <dom-if if="{{!isMobile}}">
+        <template>
+          <paper-tab name="places" id="places">
+            Local
+          </paper-tab>
+          <paper-tab name="dates" id="dates">
+            Data
+          </paper-tab>
+        </template>
+      </dom-if>
+    </paper-tabs>
+    <div class="filter-tabs">
+      <iron-pages selected="{{selected}}" attr-for-selected="name">
+        <div name="general">
+          <general-filters total="{{registerCount}}" on-has-filter-changed="setFiltersBadge" name="general"
+            filter="{{filter}}">
+          </general-filters>
+        </div>
+        <div name="dimensions">
+          <dimensions-filters on-tab-changed="fireContentChange" on-has-filter-changed="setFiltersBadge" name="dimensions"
+            filter="{{filter}}">
+          </dimensions-filters>
+        </div>
+        <div name="places">
+          <place-filters filter="{{filter}}" on-has-filter-changed="setFiltersBadge" name="places">
+          </place-filters>
+        </div>
+        <div name="dates">
+          <date-filters on-tab-changed="fireContentChange" on-has-filter-changed="setFiltersBadge" name="dates"
+            filter="{{filter}}">
+          </date-filters>
+        </div>
+      </iron-pages>
+      <div class="search">
+        <paper-button raised on-tap="submitFilters">Buscar</paper-button>
+      </div>
+    </div>
+    <dom-if if="{{isMobile}}">
+      <template>
+        <paper-menu-button horizontal-align="right" on-opened-changed="selectTab">
+          <span slot="dropdown-trigger">{{optionName}}
+            <iron-icon icon="app:expand-more"></iron-icon>
+          </span>
+          <paper-listbox slot="dropdown-content" attr-for-selected="name">
+            <paper-item name="places">Local</paper-item>
+            <paper-item name="dates">Data</paper-item>
+          </paper-listbox>
+        </paper-menu-button>
+      </template>
+    </dom-if>
   </template>
 
   <script>
@@ -77,11 +147,80 @@
       static get is() { return 'collectar-advanced-search'; }
       static get properties() {
         return {
-          prop1: {
+          selected: {
             type: String,
-            value: 'collectar-advanced-search'
-          }
+            observer: 'clearOptionName'
+          },
+          filter: {
+            type: Object,
+            value() {return {}; },
+            notify: true
+          },
+          isMobile: Boolean,
+          optionName: {
+            type: String,
+            value: 'Mais'
+          },
+          registerCount: Number
         };
+      }
+
+      static get observers() {
+        return [];
+      }
+
+      ready() {
+        super.ready();
+        this.isMobile = screen.width  <= 420;
+      }
+
+      selectTab(e) {
+        if(!this.isMobile) return;
+        const listbox = this.shadowRoot.querySelector('paper-listbox');
+        if(!listbox) return;
+        if(!e.detail.value) {
+          const item = listbox.focusedItem;
+          this.optionName = item.innerHTML;
+          const moreTab = this.shadowRoot.querySelector('#more');
+          moreTab.setAttribute('name', item.getAttribute('name'));
+          this.selected = item.getAttribute('name');
+        }
+      }
+
+      clearOptionName(selected) {
+        this.fireContentChange(selected);
+        if(['dates', 'places'].includes(selected)) return;
+        this.optionName = 'Mais';
+        const moreTab = this.shadowRoot.querySelector('#more');
+        if(!moreTab) return;
+        moreTab.setAttribute('name', 'more');
+      }
+
+      fireContentChange(selected) {
+        this.dispatchEvent(new CustomEvent('content-changed', {
+          detail: { value: selected }
+        }));
+      }
+
+      setFiltersBadge(e) {
+        const filters = e.detail.value;
+        const tabName = e.target.getAttribute('name');
+        let tab = this.shadowRoot.querySelector(`paper-tab[name="${tabName}"]`);
+        if(this.isMobile && ['dates', 'places'].includes(tabName))
+          tab = this.shadowRoot.querySelector('paper-menu-button span');
+        if(!tab) return;
+        const badge = tab.querySelector('paper-badge') || document.createElement('paper-badge');
+        badge.icon = 'app:report';
+        badge.for = tabName;
+        if(filters) {
+          tab.appendChild(badge);
+        } else if(!!tab.querySelector('paper-badge')) {
+          tab.removeChild(badge);
+        }
+      }
+
+      submitFilters(e) {
+        this.dispatchEvent(new CustomEvent('filter', { detail: { filter: this.filter } }));
       }
     }
 
