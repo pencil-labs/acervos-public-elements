@@ -73,13 +73,16 @@
         overflow-x: hidden;
         transition: opacity ease .35s;
       }
+      .drawer-content::-webkit-scrollbar {
+        display: none;
+      }
       .drawer-content .divider {
         position: absolute;
         right: 1px;
         top: 280px;
         height: 400px;
         width: 1px;
-        background: #000;
+        background: #791519;
       }
       .toggle {
         transition: transform ease .3s;
@@ -223,18 +226,12 @@
       <app-drawer slot="drawer" id="drawer" on-opened-changed="toggleColors">
         <div class="drawer-content">
           <div class="divider"></div>
-          <h3>Obra</h3>
+          <h3>{{_validate(cardItem.name)}}</h3>
           <div class="show-light">
-            Título: {{_validate(cardItem.name)}}
+            Termo: {{_validate(cardItem._taxonomy.name)}}
           </div>
           <div class="show-light">
-            Técnica: {{_validate(cardItem.technique)}}
-          </div>
-          <div class="show-light">
-            Dimensões: {{_unity(cardItem.dimensions)}}
-          </div>
-          <div class="show-light">
-            Local: {{_validate(cardItem.place)}}
+            Suporte: {{_validate(cardItem.technique)}}
           </div>
           <div class="show-light">
             Data: {{_date(cardItem.date)}}
@@ -443,7 +440,7 @@
       }
 
       _unity(dimensions) {
-        if(!dimensions) return 'Não informado.'
+        if(!dimensions) return 'Não informado'
         const frase = `${dimensions.width} x ${dimensions.height} `;
         switch(dimensions.unity) {
           case 'milimeter':
@@ -458,7 +455,7 @@
       }
 
       _date(date) {
-        if(!date || !date.dateType || !date[date.dateType]) return 'Não informado.'
+        if(!date || !date.dateType || !date[date.dateType]) return 'Não informado'
         switch(date.dateType) {
           case 'fullDate':
             let paths = date.fullDate.split('T')[0].split('-');
