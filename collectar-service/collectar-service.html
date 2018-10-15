@@ -129,7 +129,7 @@ element.
       }
 
       generateRequest() {
-        this.$.ajax.generateRequest();
+        return this.$.ajax.generateRequest().completes;
       }
 
     }

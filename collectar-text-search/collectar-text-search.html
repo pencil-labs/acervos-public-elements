@@ -65,8 +65,8 @@
       }
     </style>
     <collectar-service id="ajax" api="{{server}}" loading="{{loading}}"
-      service="{{service}}"  result="{{result}}" params="{{params}}"
-      method="{{method}}"  body="{{body}}" error="{{error}}">
+      service="{{service}}" result="{{result}}" params="{{params}}"
+      method="{{method}}" body="{{body}}" error="{{error}}">
     </collectar-service>
     <div class="search-field">
       <div class="taxonomies">
@@ -106,6 +106,10 @@
             notify: true,
             observer: 'searchTaxonomy'
           },
+          server: {
+            type: String,
+            value: ''
+          },
           result: {
             type: Object,
             observer: 'handleResult'
@@ -114,13 +118,16 @@
             type: Object,
             notify: true
           },
-          project: {
-            type: Object
+          projectId: {
+            type: String
           },
           taxonomies: {
             type: Array,
             notify: true,
             value() { return []; }
+          },
+          service: {
+            type: String
           },
           uniqueElements: Array
         };
@@ -142,7 +149,7 @@
       }
 
       remoteFilter(search) {
-        this.service = `projects/${this.project._id}/taxonomies?search=${search}`;
+        this.service = `projects/${this.projectId}/taxonomies?search=${search}`;
         this.$.ajax.generateRequest();
       }
 
@@ -172,7 +179,11 @@
         this.dispatchEvent(new CustomEvent('search', { detail: {
           search: this.search,
           taxonomies: this.taxonomies
-        } }));
+        }}));
+        this.service = `projects/${this.projectId}/taxonomies`;
+        this.$.ajax.generateRequest().then(ajax => {
+          this.set('taxonomies', ajax.response);
+        });
       }
 
       onBackspace(e) {
