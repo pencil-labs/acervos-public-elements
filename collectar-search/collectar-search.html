@@ -21,6 +21,7 @@
       <collectar-text-search id="textFilter" filter="{{filter}}" project-id="{{projectId}}"
         unique-elements="{{uniqueElements}}" search="{{search}}" server="http://localhost:4040/api">
       </collectar-text-search>
+      <slot></slot>
     </div>
   </template>
 
@@ -62,10 +63,6 @@
 
       connectedCallback() {
         super.connectedCallback();
-      }
-
-      submitFilters(e) {
-        console.log(e.detail);
       }
 
     }

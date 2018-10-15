@@ -11,7 +11,14 @@
     "iron-image": "ArthurJahn/iron-image#3e6923b",
     "grain-masonry": "daKmoR/grain-masonry#^0.8.2",
     "l2t-paper-slider": "Link2Twenty/l2t-paper-slider#^2.0.4",
-    "iron-a11y-keys": "PolymerElements/iron-a11y-keys#2.0.0"
+    "iron-a11y-keys": "PolymerElements/iron-a11y-keys#2.0.0",
+    "iron-collapse": "PolymerElements/iron-collapse#^2.0.0",
+    "paper-badge": "PolymerElements/paper-badge#^2.0.0",
+    "paper-item": "PolymerElements/paper-item#^2.0.0",
+    "paper-dropdown-menu": "polymerelements/paper-dropdown-menu#^2.0",
+    "paper-tabs": "PolymerElements/paper-tabs#^2.0.0",
+    "paper-listbox": "PolymerElements/paper-listbox#^2.0.0",
+    "paper-menu-button": "PolymerElements/paper-menu-button#^2.0.0"
   },
   "devDependencies": {
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^2.0.0",

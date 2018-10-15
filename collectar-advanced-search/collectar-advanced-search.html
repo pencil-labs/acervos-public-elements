@@ -1,10 +1,64 @@
 <link rel="import" href="../../polymer/polymer-element.html">
+<link rel="import" href="../../paper-tabs/paper-tabs.html">
+<link rel="import" href="../../paper-tabs/paper-tab.html">
+<link rel="import" href="../../paper-button/paper-button.html">
+<link rel="import" href="../../paper-listbox/paper-listbox.html">
+<link rel="import" href="../../paper-item/paper-item.html">
+<link rel="import" href="../../paper-badge/paper-badge.html">
+<link rel="import" href="../../paper-dropdown-menu/paper-dropdown-menu.html">
 
 <dom-module id="collectar-advanced-search">
   <template>
     <style>
       :host {
         display: block;
+        position: relative;
+      }
+      .search-field paper-button {
+        font-size: 0.8rem;
+        padding: 5px 10px 5px 5px;
+        margin: 0;
+        border-radius: 0;
+        color: var(--default-primary-color);
+      }
+      .search-field iron-icon {
+        margin: 0 10px 0 0;
+      }
+      paper-tab {
+        font-size: 0.8rem;
+        min-width: 50px;
+      }
+      paper-menu-button {
+        position: absolute;
+        right: 0px;
+        min-width: 60px;
+        width: calc(33.333333333% - 22px);
+        top: 6px;
+        background: white;
+        text-align: center;
+      }
+      paper-menu-button,
+      paper-item {
+        font-size: 0.8rem;
+      }
+      paper-badge {
+        position: unset;
+        display: inline-block;
+        margin-left: 10px;
+        width: 0;
+      }
+      .search {
+        margin: 10px 0;
+        text-align: right;
+      }
+      @media screen and (max-width: 420px) {
+        paper-badge {
+          margin-left: 5px;
+          width: 0;
+          --paper-badge-width: 10px;
+          --paper-badge-height: 10px;
+          --paper-badge-text-color: var(--default-primary-color);
+        }
       }
     </style>
     <h2>Hello [[prop1]]!</h2>
