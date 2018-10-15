@@ -70,7 +70,7 @@
     <l2t-paper-slider id="slider" auto-progress slide-duration="3" total-slides="5">
       <dom-repeat items="{{promotes}}">
         <template>
-          <paper-slide style="{{background(item)}}">
+          <paper-slide style="{{background(item)}}" on-click="showPromote">
             <div class="row slide-content">
               <dom-if if="{{!isPost(item)}}">
                 <template>
@@ -139,7 +139,10 @@
         this.promotes = result;
         setTimeout(() => {
           this.$.slider._reInit();
-        }, 3000);
+          this.$.slider._moveManual();
+          this.$.slider._ariaChecked();
+          this.$.slider._countSlides();
+        }, 300);
       }
 
       projectChanged(projectId) {
@@ -162,12 +165,15 @@
       background(promote) {
         const media = promote._medias[0];
         if(media) {
-          console.log(`background:url('${this.server}/promotes/${promote._id}/medias/${media.filename}');`);
-          return `background:url('${this.server}/promotes/${promote._id}/medias/${media.filename}');`;
+          return `background-image:url('${this.server}/promotes/${promote._id}/medias/${media.filename}');`;
         }
       }
       isPost(promote) {
         return promote.kind === 'publication';
+      }
+      showPromote(e) {
+        const promote = e.model.get('item');
+        this.dispatchEvent(new CustomEvent('show-promote', { detail: { promote } }));
       }
     }
 

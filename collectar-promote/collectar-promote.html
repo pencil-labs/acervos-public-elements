@@ -1,0 +1,137 @@
+<link rel="import" href="../../polymer/polymer-element.html">
+<link rel="import" href="../../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../collectar-service/collectar-service.html">
+<link rel="import" href="../collectar-icons/collectar-icons.html">
+<link rel="import" href="../collectar-list/collectar-list.html">
+
+<dom-module id="collectar-promote">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: absolute;
+        top: 0;
+        background: white;
+        overflow: auto;
+        padding: 0 20px;
+        opacity: 0;
+        transition: opacity ease .35s;
+      }
+      h1 paper-icon-button {
+        float: right;
+        line-height: 0;
+        margin-top: 5px;
+      }
+      .cover {
+        height: 50vw;
+        background-size: cover;
+      }
+    </style>
+    <collectar-service id="ajax" api="{{server}}" loading="{{loading}}"
+      service="{{service}}"  result="{{result}}" params="{{params}}"
+      method="{{method}}"  body="{{body}}" error="{{error}}">
+    </collectar-service>
+    <h1>{{promote.title}}
+      <paper-icon-button icon="app:close"
+        on-tap="dismiss"></paper-icon-button>
+    </h1>
+    <div class="cover" style="{{background(promote)}}"></div>
+    <div class="promote-cover"></div>
+    <p class="abstract">{{promote.abstract}}</p>
+    <div class="body" inner-h-t-m-l="{{promote.body}}"></div>
+    <dom-if if="{{promote.filter}}">
+      <template>
+        <collectar-list project-id="{{projectId}}"
+          server="{{server}}" query-only
+          query="{{buildFilter(promote)}}">
+        </collectar-list>
+      </template>
+    </dom-if>
+  </template>
+
+  <script>
+    /**
+     * `collectar-promote`
+     * Collectar element to present posts and highlights
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class CollectarPromote extends Polymer.Element {
+      static get is() { return 'collectar-promote'; }
+      static get properties() {
+        return {
+          projectId: {
+            type: String,
+            reflectToAttribute: true,
+            observer: 'projectChanged'
+          },
+          server: {
+            type: String,
+            value: ''
+          },
+          promote: {
+            type: Object,
+            observer: 'animate'
+          },
+          service: {
+            observer: 'generateRequest'
+          },
+          result: {
+            observer: 'setPromote'
+          },
+          loading: {
+            type: Boolean,
+            value: false
+          },
+        };
+      }
+      setPromote(result) {
+        if(!result) return;
+        this.promote = result;
+      }
+
+      projectChanged(promoteId) {
+      }
+
+      computeService(promoteId) {
+        this.service = undefined;
+
+        if (!promoteId) return;
+        this.service = `promotes/${promoteId}`;
+      }
+
+      generateRequest() {
+        if (!this.service) return;
+        this.$.ajax.generateRequest();
+      }
+      background(promote) {
+        if(!promote) return;
+        const media = promote._medias[0];
+        if(media) {
+          return `background-image:url('${this.server}/promotes/${promote._id}/medias/${media.filename}');`;
+        }
+      }
+
+      isPost(promote) {
+        return promote.kind === 'publication';
+      }
+
+      animate(promote) {
+        if(promote) this.style.opacity = '1';
+        else this.style.opacity = '0';
+      }
+      dismiss(e) {
+        this.promote = undefined;
+      }
+
+      buildFilter(promote) {
+        if(!promote || !promote.filter) return undefined;
+        return `?${promote.filter}&`;
+      }
+    }
+
+    window.customElements.define(CollectarPromote.is, CollectarPromote);
+  </script>
+</dom-module>

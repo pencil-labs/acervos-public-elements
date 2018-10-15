@@ -4,6 +4,7 @@
 <link rel="import" href="../../paper-spinner/paper-spinner-lite.html">
 <link rel="import" href="../../grain-masonry/grain-masonry.html">
 <link rel="import" href="../collectar-card/collectar-card.html">
+<link rel="import" href="../collectar-icons/collectar-icons.html">
 <link rel="import" href="../collectar-service/collectar-service.html">
 <link rel="import" href="../collectar-card-show/collectar-card-show.html">
 
@@ -101,7 +102,7 @@
         <dom-if if="{{canShowMore(loading, limit)}}">
           <template>
             <paper-icon-button elevation="1"
-              on-tap="_loadMore" icon="expand-more">
+              on-tap="_loadMore" icon="app:expand-more">
             </paper-icon-button>
           </template>
         </dom-if>
@@ -148,6 +149,7 @@
             type: String,
             observer: 'projectChanged'
           },
+          queryOnly: Boolean,
           loading: {
             type: Boolean,
             value: false
@@ -208,9 +210,9 @@
         if(!this.projectId) return;
         this.resultItems = [];
         this.$.masonry.innerHTML = '';
-        this.$.masonry.reInit();
         this.__skip = 0;
         this.set('more', false);
+        // TODO: add option to query only when query is set
         this.computeService(this.projectId, this.more);
       }
 
