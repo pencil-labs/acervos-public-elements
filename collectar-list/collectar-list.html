@@ -4,6 +4,7 @@
 <link rel="import" href="../../paper-spinner/paper-spinner-lite.html">
 <link rel="import" href="../../grain-masonry/grain-masonry.html">
 <link rel="import" href="../collectar-card/collectar-card.html">
+<link rel="import" href="../collectar-service/collectar-service.html">
 <link rel="import" href="../collectar-card-show/collectar-card-show.html">
 
 <dom-module id="collectar-list">
@@ -143,6 +144,10 @@
           result: {
             observer: 'animateItems'
           },
+          query: {
+            type: String,
+            observer: 'projectChanged'
+          },
           loading: {
             type: Boolean,
             value: false
@@ -170,7 +175,8 @@
         this.service = undefined;
 
         if (more) this.__skip = this.__skip  + 10 || 0;
-        const query = `?skip=${this.__skip}&limit=10`;
+        let query = this.query || '?';
+        query += `skip=${this.__skip}&limit=10`;
         if (!projectId) return;
         this.service = `projects/${projectId}/items${query}`;
       }
@@ -199,11 +205,13 @@
       }
 
       projectChanged(projectId) {
-        if(!projectId) return;
+        if(!this.projectId) return;
         this.resultItems = [];
+        this.$.masonry.innerHTML = '';
+        this.$.masonry.reInit();
         this.__skip = 0;
         this.set('more', false);
-        this.computeService(projectId, this.more);
+        this.computeService(this.projectId, this.more);
       }
 
       layout() {

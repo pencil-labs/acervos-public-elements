@@ -1,0 +1,176 @@
+<link rel="import" href="../../polymer/polymer-element.html">
+<link rel="import" href="../../l2t-paper-slider/l2t-paper-slider.html">
+<link rel="import" href="../collectar-service/collectar-service.html">
+
+
+<dom-module id="collectar-slide">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      l2t-paper-slider {
+        --paper-slide-height: 100vh;
+      }
+      paper-slide {
+        position: relative;
+        background-size: cover;
+        background-position: center;
+      }
+      .slide-highlight,
+      .slide-post {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 30px 40px 100px;
+        background: rgba(0,0,0,0.4);
+        color: white;
+      }
+
+      .slide-post .slide-title {
+        white-space: normal;
+        font-size: 3rem;
+      }
+      .slide-highlight .slide-title {
+        white-space: normal;
+        font-size: 4.5rem;
+        color: #ffcf1b;
+      }
+
+      h1 {
+        margin: 2rem 0;
+      }
+      p {
+        white-space: normal; 
+      }
+
+      h3 {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .carousel {
+        padding: 0;
+      }
+      
+      .slide-content {
+        padding: 0 20px;
+      }
+
+      .slide-text {
+        white-space: normal;
+      }
+
+    </style>
+    <collectar-service id="ajax" api="{{server}}" loading="{{loading}}"
+      service="{{service}}"  result="{{result}}" params="{{params}}"
+      method="{{method}}"  body="{{body}}" error="{{error}}">
+    </collectar-service>
+    <l2t-paper-slider id="slider" auto-progress slide-duration="3" total-slides="5">
+      <dom-repeat items="{{promotes}}">
+        <template>
+          <paper-slide style="{{background(item)}}">
+            <div class="row slide-content">
+              <dom-if if="{{!isPost(item)}}">
+                <template>
+                  <div class="slide-highlight">
+                    <h1 class="slide-title">{{item.title}}</h1>
+                  </div>
+                </template>
+              </dom-if>
+              <dom-if if="{{isPost(item)}}">
+                <template>
+                  <div class="slide-post">
+                    <h1 class="slide-title">{{item.title}}</h1>
+                    <p class="slide-resume">
+                      {{item.abstract}}
+                    </p>
+                  </div>
+                </template>
+              </dom-if>
+            </div>
+          </paper-slide>
+        </template>
+      </dom-repeat>
+    </l2t-paper-slider>
+  </template>
+
+  <script>
+    /**
+     * `collectar-slide`
+     * collectar slide of posts and highlights
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class CollectarSlide extends Polymer.Element {
+      static get is() { return 'collectar-slide'; }
+      static get properties() {
+        return {
+          projectId: {
+            type: String,
+            reflectToAttribute: true,
+            observer: 'projectChanged'
+          },
+          server: {
+            type: String,
+            value: ''
+          },
+          resultItems: {
+            value() { return []; },
+          },
+          service: {
+            observer: 'generateRequest'
+          },
+          result: {
+            observer: 'setPromotes'
+          },
+          loading: {
+            type: Boolean,
+            value: false
+          },
+        };
+      }
+
+      setPromotes(result) {
+        if(!result) return;
+        this.promotes = result;
+        setTimeout(() => {
+          this.$.slider._reInit();
+        }, 3000);
+      }
+
+      projectChanged(projectId) {
+        this.promotes = [];
+        this.computeService(projectId);
+      }
+
+      computeService(projectId) {
+        this.service = undefined;
+
+        const query = `?limit=5`;
+        if (!projectId) return;
+        this.service = `projects/${projectId}/promotes${query}`;
+      }
+
+      generateRequest() {
+        if (!this.service) return;
+        this.$.ajax.generateRequest();
+      }
+      background(promote) {
+        const media = promote._medias[0];
+        if(media) {
+          console.log(`background:url('${this.server}/promotes/${promote._id}/medias/${media.filename}');`);
+          return `background:url('${this.server}/promotes/${promote._id}/medias/${media.filename}');`;
+        }
+      }
+      isPost(promote) {
+        return promote.kind === 'publication';
+      }
+    }
+
+    window.customElements.define(CollectarSlide.is, CollectarSlide);
+  </script>
+</dom-module>

@@ -1,12 +1,19 @@
 <link rel="import" href="../../polymer/polymer-element.html">
+<link rel="import" href="../../iron-a11y-keys/iron-a11y-keys.html">
 
 <link rel="import" href="../collectar-service/collectar-service.html">
+<link rel="import" href="../collectar-icons/collectar-icons.html">
 
 <dom-module id="collectar-text-search">
   <template>
     <style>
       :host {
         display: block;
+        --default-primary-color: #ec8930;
+        --pink-theme-color: #b51b29;
+        max-width: 550px;
+        margin: 0 auto;
+        position: relative;
       }
       .search-field {
         display: flex;
@@ -28,7 +35,7 @@
       }
       .search-field paper-icon-button.search {
         position: absolute;
-        right: 25px;
+        right: 5px;
         opacity: 0.4;
       }
       .search-field input:focus {
@@ -79,12 +86,12 @@
         </dom-repeat>
       </div>
       <input id="input" placeholder="Buscar..." value="{{search::input}}">
+      <paper-icon-button class="search" icon="app:search" on-tap="searchFor">
+      </paper-icon-button>
       <iron-a11y-keys target="[[target]]" keys="backspace"
                     on-keys-pressed="onBackspace"></iron-a11y-keys>
       <iron-a11y-keys target="[[target]]" keys="enter"
                     on-keys-pressed="searchFor"></iron-a11y-keys>
-      <paper-icon-button class="search" icon="app:search" on-tap="searchFor">
-      </paper-icon-button>
     </div>
   </template>
 
@@ -178,12 +185,10 @@
       searchFor(e) {
         this.dispatchEvent(new CustomEvent('search', { detail: {
           search: this.search,
-          taxonomies: this.taxonomies
-        }}));
+          taxonomies: this.taxonomies,
+          query: `?taxonomies=${this.taxonomies.map(t=>t._id)}&search=${this.search}&`
+        }, bubbles: true, composed: true }));
         this.service = `projects/${this.projectId}/taxonomies`;
-        this.$.ajax.generateRequest().then(ajax => {
-          this.set('taxonomies', ajax.response);
-        });
       }
 
       onBackspace(e) {
