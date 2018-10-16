@@ -1,0 +1,150 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<link rel="import" href="../../paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../paper-range-slider/paper-range-slider.html">
+<link rel="import" href="../../paper-input/paper-input.html">
+
+<dom-module id="place-filters">
+  <template>
+    <style>
+      :host {
+        display: block;
+        padding: 0 1px 1px 0;
+      }
+      .container {
+        margin: 10px 0;
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+      }
+      .row paper-input {
+        flex: 1;
+        margin-left: 10px;
+      }
+      app-map {
+        height: 350px;
+      }
+      @media screen and (min-width: 421px) {
+        .row paper-input:first-child {
+          margin: 0;
+        }
+      }
+      @media screen and (max-width: 420px) {
+        .row {
+          display: block;
+        }
+        .row paper-input {
+          width: calc(50% - 8px);
+          display: inline-block;
+          margin: 0 10px 0 0;
+        }
+        .row paper-input:nth-child(2n) {
+          margin-right: 0;
+        }
+      }
+    </style>
+    <div class="container">
+      <h3>Local de produção</h3>
+      <div class="row">
+        <paper-input class="name" id="country"
+          value="{{country}}"
+          minlength="5" auto-validate
+          label="País">
+        </paper-input>
+        <paper-input class="name" id="state"
+          value="{{state}}"
+          minlength="2" auto-validate
+          label="Estado">
+        </paper-input>
+        <paper-input class="name" id="city"
+          value="{{city}}"
+          minlength="2" auto-validate
+          label="Cidade">
+        </paper-input>
+        <paper-input class="name" id="radius"
+          value="{{radius}}" type="number"
+          min="1" auto-validate
+          label="Alcance(em km)">
+        </paper-input>
+      </div>
+      <app-map id="map" query="{{query}}"
+        latitude="{{loc.lat}}"
+        longitude="{{loc.lng}}"
+        radius="{{radius}}"
+        on-marker-ready="resetRadius"
+      >
+
+      </app-map>
+    </div>
+  </template>
+  <script>
+    class PlaceFilters extends Polymer.Element {
+      static get is() { return 'place-filters'; }
+      static get properties() {
+        return {
+          country: String,
+          state: String,
+          city: String,
+          query: String,
+          radius: {
+            type: Number,
+            observer: 'setFilterPlace'
+          },
+          loc: {
+            type: Object,
+            value() { return {}; }
+          },
+          filter: {
+            type: Object,
+            notify: true
+          },
+          hasFilter: {
+            type: Boolean,
+            notify: true
+          }
+        };
+      }
+      static get observers() {
+        return  [
+          'computeQuery(country, state, city)',
+          'locationChanged(loc.*)'
+        ];
+      }
+
+      computeQuery(country, state, city) {
+        this.query = `${this.country}, ${this.state}, ${this.city}`;
+      }
+
+      locationChanged(locPaths) {
+        this.setFilterPlace();
+        if(!locPaths) return;
+        const rad = this.radius;
+        this.radius = 1;
+        this.radius = rad;
+      }
+      
+      setFilterPlace() {
+        if(!Number(this.radius) || !this.loc || !this.loc.lat) {
+          delete this.filter['place.loc'];
+        } else {
+          this.filter['place.loc'] = {
+            type: 'location',
+            loc: [this.loc.lng, this.loc.lat],
+            // convert km to deg by dividing to 111.12
+            radius: Number(this.radius)/111.12
+          };
+        }
+        this.notifyPath('filter');
+        this.verifyFilter();
+      }
+
+      verifyFilter() {
+        this.hasFilter = !!this.filter['place.loc'];
+      }
+      
+    }
+    customElements.define(PlaceFilters.is, PlaceFilters);
+  </script>
+</dom-module>

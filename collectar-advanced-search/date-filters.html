@@ -1,0 +1,248 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<link rel="import" href="../../iron-pages/iron-pages.html">
+<link rel="import" href="../../iron-selector/iron-selector.html">
+<link rel="import" href="../../paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../paper-range-slider/paper-range-slider.html">
+<link rel="import" href="../../paper-input/paper-input.html">
+
+<dom-module id="date-filters">
+  <template>
+    <style>
+    :host {
+      display: block;
+      padding: 0 1px 1px 0;
+    }
+    .container {
+      margin: 10px 0;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+    }
+    .acquisition,
+    .register {
+      flex: 1;
+    }
+    .production {
+      flex: 0 1 50%;
+    }
+    .type {
+      display: inline-block;
+      width: calc(40% - 5px);
+    }
+    .dates {
+      display: inline-block;
+      width: calc(60% - 5px);
+    }
+    .register {
+      margin-left: 10px;
+    }
+    iron-pages div[name="decades"] paper-input {
+      display: inline-block;
+      width: calc(50% - 10px);
+    }
+    iron-pages div[name="fullDate"] paper-input,
+    iron-pages div[name="year"]  {
+      display: inline-block;
+      width: 100%;
+    }
+    @media screen and (max-width: 960px) {
+      .row {
+        display: block;
+      }
+      .acquisition,
+      .register {
+        width: calc(50% - 10px);
+        display: inline-block;
+      }
+    }
+    @media screen and (max-width: 960px) {
+      .acquisition,
+      .register {
+        width: 100%;
+        display: block;
+        margin-left: 0;
+      }
+    }
+    </style>
+    <div class="container">
+      <div class="row">
+        <div class="production">
+          <h3>Produção</h3>
+          <div class="type">
+            <paper-dropdown-menu label="Tipo">
+              <paper-listbox slot="dropdown-content"
+                attr-for-selected="name" fallback-selection="fullDate"
+                selected="{{dateType}}">
+                <paper-item name="fullDate">Data</paper-item>
+                <paper-item name="decades">Intervalo</paper-item>
+                <paper-item name="year">Ano exato</paper-item>
+              </paper-listbox>
+            </paper-dropdown-menu>
+          </div>
+          <div class="dates">
+            <iron-pages selected="{{dateType}}" attr-for-selected="name">
+              <div name="fullDate">
+                <paper-input label="Produção" type="date" id="fullDate"
+                  on-value-changed="setDateFilter"></paper-input>
+              </div>
+              <div name="decades">
+                <paper-input label="Entre o ano" type="number" id="fromDate"
+                  on-value-changed="setDateFilter"></paper-input>
+                <paper-input label="E o ano" type="number" id="toDate"
+                  on-value-changed="setDateFilter"></paper-input>
+              </div>
+              <div name="year">
+                <paper-input label="No ano" type="number" id="year"
+                  on-value-changed="setDateFilter"></paper-input>
+              </div>
+            </iron-pages>
+          </div>
+        </div>
+        <div class="acquisition">
+          <h3>Aquisição</h3>
+          <paper-input label="Aquisição" type="date" id="acquisition"
+            on-value-changed="setDateFilter"></paper-input>
+        </div>
+        <div class="register">
+          <h3>Registro</h3>
+          <paper-input label="Registro" type="date" id="register"
+            on-value-changed="setDateFilter"></paper-input>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+    class DateFilters extends Polymer.Element {
+      static get is() { return 'date-filters'; }
+      static get properties() {
+        return {
+          selected: {
+            type: String,
+            observer: 'tabChanged'
+          },
+          dateType: {
+            type: String,
+            observer: 'tabChanged'
+          },
+          filter: {
+            type: Object,
+            notify: true
+          },
+          hasFilter: {
+            type: Boolean,
+            notify: true
+          }
+        };
+      }
+
+      setDateFilter(e) {
+        switch(this.dateType) {
+          case 'fullDate':
+            this._setFulldate(this.filter);
+            break;
+          case 'decades':
+            this._setDecades(this.filter);
+            break;
+          case 'year':
+            this._setYear(this.filter);
+            break;
+          default:
+            break;
+        }
+        this._setAcqdate(this.filter);
+        this._setRegdate(this.filter);
+        this.notifyPath('filter');
+        this.verifyFilter();
+      }
+
+      tabChanged(selected) {
+        this.dispatchEvent(new CustomEvent('tab-changed', {
+          detail: { value: selected }
+        }));
+      }
+
+      _setFulldate(filter) {
+        delete filter['date.dates.0'];
+        delete filter['date.dates.1'];
+        if(!this.$.fullDate.value) return;
+        const full = new Date(this.$.fullDate.value);
+        filter['date.dates.0'] = {
+          type: 'daterange',
+          lower: full,
+          greater: full
+        };
+      }
+      _setAcqdate(filter) {
+        if(!this.$.acquisition.value) {
+          delete filter['acquisition.date'];
+          return;
+        }
+        const full = new Date(this.$.acquisition.value);
+        filter['acquisition.date'] = {
+          type: 'daterange',
+          lower: full,
+          greater: full
+        };
+      }
+
+      _setRegdate(filter) {
+        if(!this.$.register.value) {
+          delete filter['createdAt'];
+          return;
+        }
+        const full = new Date(this.$.register.value);
+        filter['createdAt'] = {
+          type: 'daterange',
+          lower: full,
+          greater: full
+        };
+      }
+
+      _setDecades(filter) {
+        delete filter['date.dates.0'];
+        delete filter['date.dates.1'];
+        if(!this.$.fromDate.value || !this.$.toDate.value) return;
+        const from = new Date(`${this.$.fromDate.value}-01-02`);
+        const to = new Date(`${this.$.toDate.value}-12-30`);
+        filter['date.dates.0'] = {
+          type: 'daterange',
+          lower: from,
+          greater: to
+        };
+        filter['date.dates.1'] = {
+          type: 'daterange',
+          lower: from,
+          greater: to
+        };
+      }
+
+      _setYear(filter) {
+        delete filter['date.dates.0'];
+        delete filter['date.dates.1'];
+        if(!this.$.year.value) return;
+        const from = new Date(`${this.$.year.value}-01-01`);
+        const to = new Date(`${this.$.year.value}-12-31`);
+        filter['date.dates.0'] = {
+          type: 'daterange',
+          lower: from,
+          greater: to
+        };
+        filter['date.dates.1'] = {
+          type: 'daterange',
+          lower: from,
+          greater: to
+        };
+      }
+
+      verifyFilter() {
+        this.hasFilter = !!this.filter['acquisition.date'] ||
+        !!this.filter['createdAt'] || !!this.filter['date.dates.0'];
+      }
+      
+    }
+    customElements.define(DateFilters.is, DateFilters);
+  </script>
+</dom-module>
