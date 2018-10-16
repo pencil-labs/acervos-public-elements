@@ -1,0 +1,276 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<link rel="import" href="../../iron-pages/iron-pages.html">
+<link rel="import" href="../../iron-selector/iron-selector.html">
+<link rel="import" href="../../paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../paper-range-slider/paper-range-slider.html">
+<link rel="import" href="../../paper-input/paper-input.html">
+
+<dom-module id="dimensions-filters">
+  <template>
+    <style>
+      :host {
+        display: block;
+        padding: 0 1px 1px 0;
+      }
+      .container {
+        margin: 10px 0;
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+      }
+      h4 {
+        margin: 20px 0 0px 0;
+      }
+      .row[name="none"] {
+        padding: 30px;
+        text-align: center;
+        font-size: 1.5rem;
+        color: var(--disabled-text-color);
+        display: block;
+      }
+      .range {
+        flex: 1;
+        max-width: 450px;
+      }
+      .range paper-range-slider {
+        --paper-range-slider-width: calc(100% - 10px);
+        width: calc(50% - 10px);
+        display: inline-block;
+        --paper-range-slider-knob-color: var(--default-primary-color);
+        --paper-range-slider-active-color: var(--default-primary-color);
+      }
+      .range-inputs {
+        width: calc(50% - 10px);
+        display: inline-block;
+      }
+      .range-inputs paper-input {
+        display: inline-block;
+        width: calc(50% - 10px);
+      }
+      @media screen and (max-width: 960px) {
+        .range-inputs,
+        .range paper-range-slider {
+          display: block;
+          width: calc(100% - 10px);
+        }
+      }
+      @media screen and (max-width: 420px) {
+        .range-inputs paper-input:first-child {
+          margin-right: 10px;
+        }
+        .row {
+          display: block;
+        }
+      }
+    </style>
+    <div class="container">
+      <div class="row">
+        <div class="type">
+          <h3>Tipo do Objeto</h3>
+          <paper-radio-group selected="{{selected}}" allow-empty-selection>
+            <paper-radio-button name="spherical">
+              Esférico
+            </paper-radio-button>
+            <paper-radio-button name="bidimensional">
+              Bidimensional
+            </paper-radio-button>
+            <paper-radio-button name="tridimensional">
+              Tridimensional
+            </paper-radio-button>
+          </paper-radio-group>
+        </div>
+      </div>
+      <iron-pages selected="{{selected}}" attr-for-selected="name" fallback-selection="none">
+        <div class="row" name="none">
+          Selecione um tipo de objeto para buscar.
+        </div>
+        <div class="row" name="spherical">
+          <div class="range">
+            <h4>Diâmetro(cm)</h4>
+            <paper-range-slider step="1" value-max="{{ranges.maxDiameter}}" value-min="{{ranges.minDiameter}}" max="{{total}}" min="0"></paper-range-slider>
+            <div class="range-inputs">
+              <paper-input label="De" value="{{ranges.minDiameter}}" min="0" max="{{total}}" type="number"></paper-input>
+              <paper-input label="Até" value="{{ranges.maxDiameter}}" min="0" max="{{total}}" type="number"></paper-input>
+            </div>
+          </div>
+          <div class="range">
+            <h4>Peso(kg)</h4>
+            <paper-range-slider step="1" value-max="{{ranges.maxWeight}}" value-min="{{ranges.minWeight}}" max="{{total}}" min="0"></paper-range-slider>
+            <div class="range-inputs">
+              <paper-input label="De" value="{{ranges.minWeight}}" min="0" max="{{total}}" type="number"></paper-input>
+              <paper-input label="Até" value="{{ranges.maxWeight}}" min="0" max="{{total}}" type="number"></paper-input>
+            </div>
+          </div>
+        </div>
+        <div class="row" name="bidimensional">
+          <div class="range">
+            <h4>Altura(cm)</h4>
+            <paper-range-slider step="1" value-max="{{ranges.maxHeight}}" value-min="{{ranges.minHeight}}" max="{{total}}" min="0"></paper-range-slider>
+            <div class="range-inputs">
+              <paper-input label="De" value="{{ranges.minHeight}}" min="0" max="{{total}}" type="number"></paper-input>
+              <paper-input label="Até" value="{{ranges.maxHeight}}" min="0" max="{{total}}" type="number"></paper-input>
+            </div>
+          </div>
+          <div class="range">
+            <h4>Largura(cm)</h4>
+            <paper-range-slider step="1" value-max="{{ranges.maxWidth}}" value-min="{{ranges.minWidth}}" max="{{total}}" min="0"></paper-range-slider>
+            <div class="range-inputs">
+              <paper-input label="De" value="{{ranges.minWidth}}" min="0" max="{{total}}" type="number"></paper-input>
+              <paper-input label="Até" value="{{ranges.maxWidth}}" min="0" max="{{total}}" type="number"></paper-input>
+            </div>
+          </div>
+        </div>
+        <div class="row" name="tridimensional">
+          <div class="range">
+            <h4>Altura(cm)</h4>
+            <paper-range-slider step="1" value-max="{{ranges.maxHeight}}" value-min="{{ranges.minHeight}}" max="{{total}}" min="0"></paper-range-slider>
+            <div class="range-inputs">
+              <paper-input label="De" value="{{ranges.minHeight}}" min="0" max="{{total}}" type="number"></paper-input>
+              <paper-input label="Até" value="{{ranges.maxHeight}}" min="0" max="{{total}}" type="number"></paper-input>
+            </div>
+          </div>
+          <div class="range">
+            <h4>Largura(cm)</h4>
+            <paper-range-slider step="1" value-max="{{ranges.maxWidth}}" value-min="{{ranges.minWidth}}" max="{{total}}" min="0"></paper-range-slider>
+            <div class="range-inputs">
+              <paper-input label="De" value="{{ranges.minWidth}}" min="0" max="{{total}}" type="number"></paper-input>
+              <paper-input label="Até" value="{{ranges.maxWidth}}" min="0" max="{{total}}" type="number"></paper-input>
+            </div>
+          </div>
+          <div class="range">
+            <h4>Profundidade(cm)</h4>
+            <paper-range-slider step="1" value-max="{{ranges.maxDepth}}" value-min="{{ranges.minDepth}}" max="{{total}}" min="0"></paper-range-slider>
+            <div class="range-inputs">
+              <paper-input label="De" value="{{ranges.minDepth}}" min="0" max="{{total}}" type="number"></paper-input>
+              <paper-input label="Até" value="{{ranges.maxDepth}}" min="0" max="{{total}}" type="number"></paper-input>
+            </div>
+          </div>
+        </div>
+      </iron-pages>
+    </div>
+  </template>
+  <script>
+    class DimensionsFilters extends Polymer.Element {
+      static get is() { return 'dimensions-filters'; }
+        static get properties() {
+          return {
+            ranges: {
+              type: Object,
+              value() { return {
+                maxDiameter: 9999,
+                minDiameter: 0,
+                maxWeight: 9999,
+                minWeight: 0,
+                maxWidth: 9999,
+                minWidth: 0,
+                maxHeight: 9999,
+                minHeight: 0,
+                maxDepth: 9999,
+                minDepth: 0,
+              }; },
+            },
+            total: {
+              type: Number,
+              value: 9999,
+            },
+            filter: Object,
+            selected: {
+              type: String,
+              observer: 'tabChanged'
+            },
+            hasFilter: {
+              type: Boolean,
+              notify: true
+            }
+          };
+        }
+        static get observers() { return [
+          'observeRanges(ranges.*)'
+        ]; }
+
+        observeRanges(ranges) {
+          this.setDimensionsFilter(this.selected);
+        }
+
+        setDimensionsFilter(selected) {
+          switch(selected) {
+            case 'spherical':
+              delete this.filter['dimensions.depth'];
+              delete this.filter['dimensions.width'];
+              delete this.filter['dimensions.height'];
+              this.filter['dimensions.diameter'] = {
+                type: 'interval',
+                lower: this.ranges.minDiameter,
+                greater: this.ranges.maxDiameter,
+              };
+              this.filter['dimensions.weight'] = {
+                type: 'interval',
+                lower: this.ranges.minWeight,
+                greater: this.ranges.maxWeight,
+              };
+            break;
+            case 'bidimensional':
+              delete this.filter['dimensions.depth'];
+              delete this.filter['dimensions.diameter'];
+              delete this.filter['dimensions.weight'];
+              this.filter['dimensions.width'] = {
+                type: 'interval',
+                lower: this.ranges.minWidth,
+                greater: this.ranges.maxWidth,
+              };
+              this.filter['dimensions.height'] = {
+                type: 'interval',
+                lower: this.ranges.minHeight,
+                greater: this.ranges.maxHeight,
+              };
+            break;
+            case 'tridimensional':
+              delete this.filter['dimensions.diameter'];
+              delete this.filter['dimensions.weight'];
+              this.filter['dimensions.width'] = {
+                type: 'interval',
+                lower: this.ranges.minWidth,
+                greater: this.ranges.maxWidth,
+              };
+              this.filter['dimensions.height'] = {
+                type: 'interval',
+                lower: this.ranges.minHeight,
+                greater: this.ranges.maxHeight,
+              };
+              this.filter['dimensions.depth'] = {
+                type: 'interval',
+                lower: this.ranges.minDepth,
+                greater: this.ranges.maxDepth,
+              };
+            break;
+            default:
+              delete this.filter['dimensions.depth'];
+              delete this.filter['dimensions.width'];
+              delete this.filter['dimensions.height'];
+              delete this.filter['dimensions.weight'];
+              delete this.filter['dimensions.diameter'];
+            break;
+          }
+          this.notifyPath('filter');
+          this.verifyFilter();
+        }
+
+        tabChanged(selected) {
+          this.setDimensionsFilter(selected);
+          this.dispatchEvent(new CustomEvent('tab-changed', {
+            detail: { value: selected }
+          }));
+        }
+
+        verifyFilter() {
+          this.hasFilter = !!this.filter['dimensions.depth'] ||
+          !!this.filter['dimensions.width'] || !!this.filter['dimensions.height'] ||
+          !!this.filter['dimensions.weight'] || !!this.filter['dimensions.diameter'];
+        }
+    }
+    customElements.define(DimensionsFilters.is, DimensionsFilters);
+  </script>
+</dom-module>
