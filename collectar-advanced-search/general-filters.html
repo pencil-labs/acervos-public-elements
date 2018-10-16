@@ -1,0 +1,195 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<link rel="import" href="../../paper-range-slider/paper-range-slider.html">
+<link rel="import" href="../../paper-input/paper-input.html">
+<link rel="import" href="../../paper-checkbox/paper-checkbox.html">
+
+<dom-module id="general-filters">
+  <template>
+    <style>
+      :host {
+        display: block;
+        padding: 0 1px 1px 0;
+      }
+      .container {
+        margin: 10px 0;
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+      }
+      .state {
+        flex: 1;
+        max-width: 450px;
+      }
+      .state paper-checkbox {
+        margin: 0 5px;
+      }
+      .artist {
+        flex: 1;
+      }
+      .register {
+        flex: 1;
+        max-width: 450px;
+      }
+      .register paper-range-slider {
+        --paper-range-slider-width: calc(100% - 10px);
+        width: calc(50% - 10px);
+        display: inline-block;
+        --paper-range-slider-knob-color: var(--default-primary-color);
+        --paper-range-slider-active-color: var(--default-primary-color);
+      }
+      .register-range {
+        width: calc(50% - 10px);
+        display: inline-block;
+      }
+      .register-range paper-input {
+        display: inline-block;
+      }
+      .register-range paper-input {
+        width: calc(50% - 10px);
+      }
+      .collection {
+        flex: 1;
+      }
+      @media screen and (max-width: 960px) {
+        .register-range,
+        .register paper-range-slider {
+          display: block;
+          width: calc(100% - 10px);
+        }
+      }
+      @media screen and (min-width: 728px) and (max-width: 960px) {
+      }
+      @media screen and (max-width: 420px) {
+        .state {
+          display: block;
+        }
+        .register-range paper-input:first-child {
+          margin-right: 10px;
+        }
+        .row {
+          display: block;
+        }
+      }
+    </style>
+    <div class="container">
+      <div class="row">
+        <div class="state">
+          <h3>Estado de conservação</h3>
+          <paper-checkbox on-checked-changed="setGeneralFilters"
+            name="excelent">Ótimo</paper-checkbox>
+          <paper-checkbox on-checked-changed="setGeneralFilters"
+            name="good">Bom</paper-checkbox>
+          <paper-checkbox on-checked-changed="setGeneralFilters"
+            name="regular">Regular</paper-checkbox>
+          <paper-checkbox on-checked-changed="setGeneralFilters"
+            name="bad">Ruim</paper-checkbox>
+        </div>
+        <div class="artist">
+          <h3>Artista</h3>
+          <paper-input label="Autor" on-value-changed="setGeneralFilters"
+            type="text" id="author"></paper-input>
+        </div>
+      </div>
+      <div class="row">
+        <div class="register">
+          <h3>Número de registro</h3>
+          <paper-range-slider step="1" value-max="{{max}}"
+            value-min="{{min}}" max="{{total}}" min="0"></paper-range-slider>
+          <div class="register-range">
+            <paper-input label="De" value="{{min}}" min="0"
+              max="{{total}}" type="number"></paper-input>
+            <paper-input label="Até" value="{{max}}" min="0"
+              max="{{total}}" type="number"></paper-input>
+          </div>
+        </div>
+        <div class="collection">
+          <h3>Coleção</h3>
+          <paper-input label="Coleção" on-value-changed="setGeneralFilters"
+            type="text" id="collection"></paper-input>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+    class GeneralFilters extends Polymer.Element {
+      static get is() { return 'general-filters'; }
+      static get properties() {
+        return {
+          total: {
+            type: Number,
+            observer: 'computeMax'
+          },
+          filter: {
+            type: Object,
+            notify: true
+          },
+          min: Number,
+          max: Number,
+          hasFilter: {
+            type: Boolean,
+            notify: true
+          }
+        };
+      }
+      static get observers() { return ['setRegisterInterval(min, max)']; }
+
+      setGeneralFilters(e) {
+        this.setConditionState(e);
+        this.setAuthorFilter(e);
+        this.setCollectionFilter(e);
+        this.notifyPath('filter');
+        this.verifyFilter();
+      }
+
+      setConditionState(e) {
+        const state = e.target.getAttribute('name');
+        if(e.target.tagName !== 'PAPER-CHECKBOX') return;
+        if(!e.detail.value) {
+          const i = this.filter.state ? this.filter.state.indexOf(state) : -1;
+          if(i >= 0) this.filter.state.splice(i, 1);
+          if(!i && !this.filter.state.length) delete this.filter.state;
+        } else {
+          if(!this.filter.state) this.filter.state = [];
+          this.filter.state.push(state);
+        }
+      }
+
+      setRegisterInterval(min, max) {
+        const diff = this.max - this.min;
+        if(!(diff >= this.total) && !(this.max > this.total)) {
+          this.filter.regNumber = {
+            type: 'interval',
+            lower: this.min,
+            greater: this.max
+          };
+        } else {
+          delete this.filter.regNumber;
+        }
+        this.verifyFilter();
+      }
+
+      setAuthorFilter(e) {
+        if(e.target.id !== 'author') return;
+        if(!e.detail.value) delete this.filter.author;
+        else this.filter.author = e.detail.value;
+      }
+      setCollectionFilter(e) {
+        if(e.target.id !== 'collection') return;
+        if(!e.detail.value) delete this.filter.category;
+        else this.filter.category = e.detail.value;
+      }
+      computeMax(total) {
+        this.max = total;
+      }
+
+      verifyFilter() {
+        this.hasFilter = !!this.filter.state || !!this.filter.regNumber ||
+        !!this.filter.author || !!this.filter.category;
+      }
+      
+    }
+    customElements.define(GeneralFilters.is, GeneralFilters);
+  </script>
+</dom-module>
