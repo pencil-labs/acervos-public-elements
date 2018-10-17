@@ -19,100 +19,17 @@
       :host {
         display: block;
         position: relative;
-        max-width: 550px;
-        margin: 0 auto;
       }
-      .search-field paper-button {
-        font-size: 0.8rem;
-        padding: 5px 10px 5px 5px;
-        margin: 0;
-        border-radius: 0;
-        color: var(--default-primary-color);
-      }
-      .search-field iron-icon {
-        margin: 0 10px 0 0;
-      }
-      paper-tab {
-        font-size: 0.8rem;
-        min-width: 50px;
-      }
-      paper-menu-button {
-        position: absolute;
-        right: 0px;
-        min-width: 60px;
-        width: calc(33.333333333% - 22px);
-        top: 6px;
-        background: white;
-        text-align: center;
-      }
-      paper-menu-button,
-      paper-item,
-      paper-button {
-        font-size: 0.8rem;
-      }
-      paper-badge {
-        position: unset;
-        display: inline-block;
-        margin-left: 10px;
-        width: 0;
-      }
-      .search {
-        margin: 10px 0;
-        text-align: right;
-      }
-      @media screen and (max-width: 420px) {
-        paper-badge {
-          margin-left: 5px;
-          width: 0;
-          --paper-badge-width: 10px;
-          --paper-badge-height: 10px;
-          --paper-badge-text-color: var(--default-primary-color);
-        }
-      }
+      
     </style>
     <collectar-service id="ajax" api="{{server}}" loading="{{loading}}"
       service="{{service}}" result="{{result}}" params="{{params}}"
       method="{{method}}" body="{{body}}" error="{{error}}">
     </collectar-service>
-    <paper-tabs id="tabs" attr-for-selected="name"
-      selected="{{selected}}">
-      <paper-tab name="general" id="general">
-        Geral
-      </paper-tab>
-      <paper-tab name="dates" id="dates">
-        Data
-      </paper-tab>
-    </paper-tabs>
-    <div class="filter-tabs">
-      <iron-pages selected="{{selected}}" attr-for-selected="name">
-        <div name="general">
-          <general-filters total="{{registerCount}}" on-has-filter-changed="setFiltersBadge" name="general"
-            filter="{{filter}}">
-          </general-filters>
-        </div>
-        <div name="dates">
-          <date-filters on-tab-changed="fireContentChange" on-has-filter-changed="setFiltersBadge" name="dates"
-            filter="{{filter}}">
-          </date-filters>
-        </div>
-      </iron-pages>
-      <div class="search">
-        <paper-button raised on-tap="submitFilters">Buscar</paper-button>
-      </div>
+    <div class="content">
+      <general-filters total="{{registerCount}}" filter="{{filter}}">
+      </general-filters>
     </div>
-    <dom-if if="{{isMobile}}">
-      <template>
-        <paper-menu-button horizontal-align="right" on-opened-changed="selectTab">
-          <span slot="dropdown-trigger">{{optionName}}
-            <iron-icon icon="app:expand-more"></iron-icon>
-          </span>
-          <paper-listbox slot="dropdown-content" attr-for-selected="name">
-            <paper-item name="places">Local</paper-item>
-            <paper-item name="dates">Data</paper-item>
-          </paper-listbox>
-        </paper-menu-button>
-      </template>
-    </dom-if>
   </template>
 
   <script>

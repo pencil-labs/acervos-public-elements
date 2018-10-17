@@ -9,105 +9,40 @@
     <style>
       :host {
         display: block;
-        padding: 0 1px 1px 0;
       }
-      .container {
-        margin: 10px 0;
-      }
-      .row {
-        display: flex;
-        justify-content: space-between;
-      }
-      .state {
-        flex: 1;
-        max-width: 450px;
-      }
-      .state paper-checkbox {
-        margin: 0 5px;
-      }
-      .artist {
-        flex: 1;
-      }
-      .register {
-        flex: 1;
-        max-width: 450px;
-      }
-      .register paper-range-slider {
-        --paper-range-slider-width: calc(100% - 10px);
-        width: calc(50% - 10px);
-        display: inline-block;
-        --paper-range-slider-knob-color: var(--default-primary-color);
-        --paper-range-slider-active-color: var(--default-primary-color);
-      }
-      .register-range {
-        width: calc(50% - 10px);
-        display: inline-block;
-      }
-      .register-range paper-input {
-        display: inline-block;
-      }
-      .register-range paper-input {
-        width: calc(50% - 10px);
-      }
-      .collection {
-        flex: 1;
-      }
-      @media screen and (max-width: 960px) {
-        .register-range,
-        .register paper-range-slider {
-          display: block;
-          width: calc(100% - 10px);
-        }
-      }
-      @media screen and (min-width: 728px) and (max-width: 960px) {
-      }
-      @media screen and (max-width: 420px) {
-        .state {
-          display: block;
-        }
-        .register-range paper-input:first-child {
-          margin-right: 10px;
-        }
-        .row {
-          display: block;
-        }
-      }
+      
     </style>
     <div class="container">
-      <div class="row">
-        <div class="state">
-          <h3>Estado de conservação</h3>
-          <paper-checkbox on-checked-changed="setGeneralFilters"
-            name="excelent">Ótimo</paper-checkbox>
-          <paper-checkbox on-checked-changed="setGeneralFilters"
-            name="good">Bom</paper-checkbox>
-          <paper-checkbox on-checked-changed="setGeneralFilters"
-            name="regular">Regular</paper-checkbox>
-          <paper-checkbox on-checked-changed="setGeneralFilters"
-            name="bad">Ruim</paper-checkbox>
+      <div class="production">
+        <h3>Produção</h3>
+        <div class="type">
+          <paper-dropdown-menu label="Tipo">
+            <paper-listbox slot="dropdown-content"
+              attr-for-selected="name" fallback-selection="fullDate"
+              selected="{{dateType}}">
+              <paper-item name="fullDate">Data</paper-item>
+              <paper-item name="decades">Intervalo</paper-item>
+              <paper-item name="year">Ano exato</paper-item>
+            </paper-listbox>
+          </paper-dropdown-menu>
         </div>
-        <div class="artist">
-          <h3>Artista</h3>
-          <paper-input label="Autor" on-value-changed="setGeneralFilters"
-            type="text" id="author"></paper-input>
-        </div>
-      </div>
-      <div class="row">
-        <div class="register">
-          <h3>Número de registro</h3>
-          <paper-range-slider step="1" value-max="{{max}}"
-            value-min="{{min}}" max="{{total}}" min="0"></paper-range-slider>
-          <div class="register-range">
-            <paper-input label="De" value="{{min}}" min="0"
-              max="{{total}}" type="number"></paper-input>
-            <paper-input label="Até" value="{{max}}" min="0"
-              max="{{total}}" type="number"></paper-input>
-          </div>
-        </div>
-        <div class="collection">
-          <h3>Coleção</h3>
-          <paper-input label="Coleção" on-value-changed="setGeneralFilters"
-            type="text" id="collection"></paper-input>
+        <div class="dates">
+          <iron-pages selected="{{dateType}}" attr-for-selected="name">
+            <div name="fullDate">
+              <paper-input label="Produção" type="date" id="fullDate"
+                on-value-changed="setDateFilter"></paper-input>
+            </div>
+            <div name="decades">
+              <paper-input label="Entre o ano" type="number" id="fromDate"
+                on-value-changed="setDateFilter"></paper-input>
+              <paper-input label="E o ano" type="number" id="toDate"
+                on-value-changed="setDateFilter"></paper-input>
+            </div>
+            <div name="year">
+              <paper-input label="No ano" type="number" id="year"
+                on-value-changed="setDateFilter"></paper-input>
+            </div>
+          </iron-pages>
         </div>
       </div>
     </div>

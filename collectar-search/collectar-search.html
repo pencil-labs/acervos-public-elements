@@ -8,9 +8,23 @@
     <style>
       :host {
         display: block;
+        --iron-icon-width: 20px;
+        --iron-icon-height: 20px;
       }
       .content {
         padding: 20px;
+        display: grid;
+        grid-template-columns: minmax(250px, 1fr) 1fr minmax(110px, 1fr);
+      }
+      collectar-text-search {
+        grid-column: 1 / 3;
+      }
+      ::slotted(.advanced-toggle) {
+        font-size: 0.8rem;
+        grid-column: 3 / 4;
+      }
+      ::slotted(collectar-advanced-search) {
+        grid-column: 1 / -1;
       }
     </style>
     <collectar-service id="ajax" api="{{server}}" loading="{{loading}}"
@@ -21,6 +35,7 @@
       <collectar-text-search id="textFilter" filter="{{filter}}" project-id="{{projectId}}"
         unique-elements="{{uniqueElements}}" search="{{search}}" server="http://localhost:4040/api">
       </collectar-text-search>
+      <slot name="advanced-toggle"></slot>
       <slot></slot>
     </div>
   </template>
