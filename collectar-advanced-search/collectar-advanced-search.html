@@ -79,26 +79,9 @@
       <paper-tab name="general" id="general">
         Geral
       </paper-tab>
-      <paper-tab name="dimensions" id="dimensions">
-        Dimensões
+      <paper-tab name="dates" id="dates">
+        Data
       </paper-tab>
-      <dom-if if="{{isMobile}}">
-        <template>
-          <paper-tab id="more" name="more">
-            Mais
-          </paper-tab>
-        </template>
-      </dom-if>
-      <dom-if if="{{!isMobile}}">
-        <template>
-          <paper-tab name="places" id="places">
-            Local
-          </paper-tab>
-          <paper-tab name="dates" id="dates">
-            Data
-          </paper-tab>
-        </template>
-      </dom-if>
     </paper-tabs>
     <div class="filter-tabs">
       <iron-pages selected="{{selected}}" attr-for-selected="name">
@@ -106,15 +89,6 @@
           <general-filters total="{{registerCount}}" on-has-filter-changed="setFiltersBadge" name="general"
             filter="{{filter}}">
           </general-filters>
-        </div>
-        <div name="dimensions">
-          <dimensions-filters on-tab-changed="fireContentChange" on-has-filter-changed="setFiltersBadge" name="dimensions"
-            filter="{{filter}}">
-          </dimensions-filters>
-        </div>
-        <div name="places">
-          <place-filters filter="{{filter}}" on-has-filter-changed="setFiltersBadge" name="places">
-          </place-filters>
         </div>
         <div name="dates">
           <date-filters on-tab-changed="fireContentChange" on-has-filter-changed="setFiltersBadge" name="dates"
