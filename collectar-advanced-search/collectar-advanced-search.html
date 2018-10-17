@@ -7,10 +7,7 @@
 <link rel="import" href="../../paper-badge/paper-badge.html">
 <link rel="import" href="../../paper-dropdown-menu/paper-dropdown-menu.html">
 
-<link rel="import" href="./general-filters.html">
-<link rel="import" href="./dimensions-filter.html">
-<link rel="import" href="./place-filters.html">
-<link rel="import" href="./date-filters.html">
+<link rel="import" href="./fjm-filters.html">
 <link rel="import" href="../collectar-icons/collectar-icons.html">
 
 <dom-module id="collectar-advanced-search">
@@ -20,6 +17,14 @@
         display: block;
         position: relative;
       }
+      .content {
+        display: grid;
+      }
+      paper-button {
+        justify-self: right;
+        font-size: 0.8rem;
+        margin-top: 5px;
+      }
       
     </style>
     <collectar-service id="ajax" api="{{server}}" loading="{{loading}}"
@@ -27,8 +32,9 @@
       method="{{method}}" body="{{body}}" error="{{error}}">
     </collectar-service>
     <div class="content">
-      <general-filters total="{{registerCount}}" filter="{{filter}}">
-      </general-filters>
+      <fjm-filters total="{{registerCount}}" filter="{{filter}}">
+      </fjm-filters>
+      <paper-button raised on-tap="submitFilters">Buscar</paper-button>
     </div>
   </template>
 

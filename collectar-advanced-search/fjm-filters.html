@@ -1,0 +1,232 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<link rel="import" href="../../iron-pages/iron-pages.html">
+<link rel="import" href="../../iron-selector/iron-selector.html">
+<link rel="import" href="../../paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../paper-range-slider/paper-range-slider.html">
+<link rel="import" href="../../paper-input/paper-input.html">
+<link rel="import" href="../../paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../paper-listbox/paper-listbox.html">
+<link rel="import" href="../../paper-item/paper-item.html">
+<link rel="import" href="../../web-animations-js/web-animations.min.js">
+<link rel="import" href="../../neon-animation/web-animations.html">
+<link rel="import" href="../../paper-checkbox/paper-checkbox.html">
+
+<dom-module id="fjm-filters">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+    .container {
+      display: grid;
+      grid-row-gap: 10px;
+    }
+    .production {
+      display: grid;
+      align-items: self-end;
+      grid-column-gap: 10px;
+      grid-template-rows: minmax(64px, 1fr);
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .type paper-dropdown-menu {
+      width: 100%;
+    }
+    div[name="decades"] {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(150px, 1fr));
+      grid-column-gap: 5px;
+    }
+    .media {
+      display: grid;
+      grid-template-columns: max-content minmax(min-content, 1fr) minmax(min-content, 1fr);
+      grid-column-gap: 10px;
+      align-items: end;
+    }
+    .media paper-checkbox {
+      padding: 8px 10px;
+    }
+    @media screen and (max-width: 480px) {
+      .production {
+        grid-template-columns: unset;
+      }
+    }
+    
+    </style>
+    <div class="container">
+      <div class="production">
+        <div class="type">
+          <paper-dropdown-menu label="Tipo">
+            <paper-listbox slot="dropdown-content"
+              attr-for-selected="name" fallback-selection="fullDate"
+              selected="{{dateType}}">
+              <paper-item name="fullDate">Data</paper-item>
+              <paper-item name="decades">Intervalo</paper-item>
+              <paper-item name="year">Ano exato</paper-item>
+            </paper-listbox>
+          </paper-dropdown-menu>
+        </div>
+        <div class="dates">
+          <iron-pages selected="{{dateType}}" attr-for-selected="name">
+            <div name="fullDate">
+              <paper-input label="Produção" type="date" id="fullDate"
+                on-value-changed="setDateFilter"></paper-input>
+            </div>
+            <div name="decades">
+              <paper-input label="Entre o ano" type="number" id="fromDate"
+                on-value-changed="setDateFilter"></paper-input>
+              <paper-input label="E o ano" type="number" id="toDate"
+                on-value-changed="setDateFilter"></paper-input>
+            </div>
+            <div name="year">
+              <paper-input label="No ano" type="number" id="year"
+                on-value-changed="setDateFilter"></paper-input>
+            </div>
+          </iron-pages>
+        </div>
+      </div>
+      <div class="media">
+        <paper-checkbox class="name" id="subtitles" on-change="setSubFilter">
+          Com legenda
+        </paper-checkbox>
+        <paper-dropdown-menu class="name" id="color"
+          value="{{element.color}}" label="Esquema de cor">
+          <paper-listbox slot="dropdown-content" on-selected-changed="setColorFilter">
+            <paper-item>Colorido</paper-item>
+            <paper-item>Preto e Branco</paper-item>
+            <paper-item>Ambos</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu>
+        <paper-dropdown-menu class="name" id="lang"
+          value="{{element.lang}}" label="Idioma">
+          <paper-listbox slot="dropdown-content" on-selected-changed="setLangFilter">
+            <paper-item>Português</paper-item>
+            <paper-item>Inglês</paper-item>
+            <paper-item>Espanhol</paper-item>
+            <paper-item>Russo</paper-item>
+            <paper-item>Italiano</paper-item>
+            <paper-item>Alemão</paper-item>
+            <paper-item>Outro</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu>
+      </div>
+    </div>
+  </template>
+  <script>
+    class FjmFilters extends Polymer.Element {
+      static get is() { return 'fjm-filters'; }
+      static get properties() {
+        return {
+          selected: {
+            type: String,
+            observer: 'tabChanged'
+          },
+          dateType: {
+            type: String,
+            observer: 'tabChanged'
+          },
+          filter: {
+            type: Object,
+            notify: true
+          },
+          hasFilter: {
+            type: Boolean,
+            notify: true
+          }
+        };
+      }
+
+      setDateFilter(e) {
+        switch(this.dateType) {
+          case 'fullDate':
+            this._setFulldate(this.filter);
+            break;
+          case 'decades':
+            this._setDecades(this.filter);
+            break;
+          case 'year':
+            this._setYear(this.filter);
+            break;
+          default:
+            break;
+        }
+        this.notifyPath('filter');
+        this.verifyFilter();
+      }
+
+      _setFulldate(filter) {
+        delete filter['date.dates.0'];
+        delete filter['date.dates.1'];
+        if(!this.$.fullDate.value) return;
+        const full = new Date(this.$.fullDate.value);
+        filter['date.dates.0'] = {
+          type: 'daterange',
+          lower: full,
+          greater: full
+        };
+      }
+
+      _setDecades(filter) {
+        delete filter['date.dates.0'];
+        delete filter['date.dates.1'];
+        if(!this.$.fromDate.value || !this.$.toDate.value) return;
+        const from = new Date(`${this.$.fromDate.value}-01-02`);
+        const to = new Date(`${this.$.toDate.value}-12-30`);
+        filter['date.dates.0'] = {
+          type: 'daterange',
+          lower: from,
+          greater: to
+        };
+        filter['date.dates.1'] = {
+          type: 'daterange',
+          lower: from,
+          greater: to
+        };
+      }
+
+      _setYear(filter) {
+        delete filter['date.dates.0'];
+        delete filter['date.dates.1'];
+        if(!this.$.year.value) return;
+        const from = new Date(`${this.$.year.value}-01-01`);
+        const to = new Date(`${this.$.year.value}-12-31`);
+        filter['date.dates.0'] = {
+          type: 'daterange',
+          lower: from,
+          greater: to
+        };
+        filter['date.dates.1'] = {
+          type: 'daterange',
+          lower: from,
+          greater: to
+        };
+      }
+
+      verifyFilter() {
+        this.hasFilter = !!this.filter['acquisition.date'] ||
+        !!this.filter['createdAt'] || !!this.filter['date.dates.0'];
+      }
+
+      setColorFilter(e) {
+        if(!this.$.color.value) return;
+        this.filter['color'] = this.$.color.value;
+      }
+
+      setLangFilter(e) {
+        if(!this.$.lang.value) return;
+        this.filter['language'] = this.$.lang.value;
+      }
+
+      setSubFilter(e) {
+        if(e.target.checked) {
+          this.filter['subtitles'] = true;
+        } else {
+          delete this.filter['subtitles'];
+        }
+      }
+      
+    }
+    customElements.define(FjmFilters.is, FjmFilters);
+  </script>
+</dom-module>
