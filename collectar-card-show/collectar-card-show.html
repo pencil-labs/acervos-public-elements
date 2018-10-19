@@ -228,7 +228,7 @@
           <div class="divider"></div>
           <h3>{{_validate(cardItem.name)}}</h3>
           <div class="show-light">
-            Termo: {{_validate(cardItem._taxonomy.name)}}
+            Termo: {{_validate(cardItem._populatedTaxonomies.0.name)}}
           </div>
           <div class="show-light">
             Suporte: {{_validate(cardItem.technique)}}
@@ -455,10 +455,10 @@
       }
 
       _date(date) {
-        if(!date || !date.dateType || !date[date.dateType]) return 'Não informado'
+        if(!date || !date.dateType) return 'Não informado'
         switch(date.dateType) {
           case 'fullDate':
-            let paths = date.fullDate.split('T')[0].split('-');
+            let paths = date.dates[0].split('T')[0].split('-');
             return `${paths[2]}/${paths[1]}/${paths[0]}`;
           case 'decades':
             return `${date.decades.from}-${date.decades.to}`;
