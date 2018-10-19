@@ -1,8 +1,10 @@
 <link rel="import" href="../../polymer/polymer-element.html">
 <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../vaadin-rich-text-editor/vaadin-rich-text-editor.html">
 <link rel="import" href="../collectar-service/collectar-service.html">
 <link rel="import" href="../collectar-icons/collectar-icons.html">
 <link rel="import" href="../collectar-list/collectar-list.html">
+<link rel="import" href="./vaadin-theme.html">
 
 <dom-module id="collectar-promote">
   <template>
@@ -40,7 +42,8 @@
     <div class="cover" style="{{background(promote)}}"></div>
     <div class="promote-cover"></div>
     <p class="abstract">{{promote.abstract}}</p>
-    <div class="body" inner-h-t-m-l="{{promote.body}}"></div>
+    <vaadin-rich-text-editor readonly value="{{promote.body}}">
+    </vaadin-rich-text-editor>
     <dom-if if="{{promote.filter}}">
       <template>
         <collectar-list project-id="{{projectId}}"
