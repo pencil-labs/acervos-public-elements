@@ -58,6 +58,7 @@
         display: inline-block;
         width: calc(25% - 20px);
         margin: 20px 10px 0;
+        @apply --collectar-card;
       }
       grain-masonry {
         width: calc(100% + 20px);
@@ -70,12 +71,12 @@
       }
       @media screen and (max-width: 961px) {
         collectar-card {
-          width: calc(50% - 20px);
+          width: calc(33.333333333% - 20px);
         }
       }
-      @media screen and (min-width: 641px) and (max-width: 718px) {
+      @media screen and (max-width: 718px) {
         collectar-card {
-          width: calc(100% - 20px);
+          width: calc(50% - 20px);
         }
       }
       @media screen and (max-width: 480px) {
@@ -103,7 +104,7 @@
         <dom-if if="{{canShowMore(loading, limit)}}">
           <template>
             <paper-icon-button elevation="1"
-              on-tap="_loadMore" icon="app:expand-more">
+              on-tap="_loadMore" icon="collectar:expand-more">
             </paper-icon-button>
           </template>
         </dom-if>
