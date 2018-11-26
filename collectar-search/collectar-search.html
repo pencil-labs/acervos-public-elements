@@ -35,7 +35,7 @@
     </collectar-service>
     <div class="content">
       <collectar-text-search id="textFilter" filter="{{filter}}" project-id="{{projectId}}"
-        unique-elements="{{uniqueElements}}" search="{{search}}" server="http://localhost:4040/api">
+        unique-elements="{{uniqueElements}}" search="{{search}}" server="{{server}}" disable-taxonomies="{{disableTaxonomies}}">
       </collectar-text-search>
       <slot name="advanced-toggle"></slot>
       <slot></slot>
@@ -74,7 +74,8 @@
           loading: {
             type: Boolean,
             value: false
-          }
+          },
+          disableTaxonomies: Boolean
         };
       }
 

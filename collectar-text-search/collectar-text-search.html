@@ -138,7 +138,8 @@
           service: {
             type: String
           },
-          uniqueElements: Array
+          uniqueElements: Array,
+          disableTaxonomies: Boolean
         };
       }
 
@@ -148,6 +149,7 @@
       }
 
       searchTaxonomy(search) {
+        if(this.disableTaxonomies) return;
         this.removeCandidate = undefined;
         if(!search.includes(' ') || this.loading) return;
         if(!this.filterResult) {
@@ -185,10 +187,12 @@
       }
 
       searchFor(e) {
+        let query = `?search=${this.search}&`;
+        if(!this.disableTaxonomies) query += `taxonomies=${this.taxonomies.map(t=>t._id)}&`;
         this.dispatchEvent(new CustomEvent('search', { detail: {
           search: this.search,
           taxonomies: this.taxonomies,
-          query: `?taxonomies=${this.taxonomies.map(t=>t._id)}&search=${this.search}&`
+          query
         }, bubbles: true, composed: true }));
         this.service = `projects/${this.projectId}/taxonomies`;
       }
