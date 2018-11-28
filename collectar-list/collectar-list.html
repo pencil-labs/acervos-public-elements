@@ -104,7 +104,7 @@
         <dom-if if="{{canShowMore(loading, limit)}}">
           <template>
             <paper-icon-button elevation="1"
-              on-tap="_loadMore" icon="collectar:expand-more">
+              on-tap="_loadMore" icon="app:expand-more">
             </paper-icon-button>
           </template>
         </dom-if>
@@ -189,9 +189,9 @@
         if(!result || !result.results.length) return;
         this.limit = false;
         const resultItems = result.results.map((item) => {
-          if(item._data.RelatedMedias) {
-            item._data.RelatedMedias._files = Array.from(item._data.RelatedMedias._medias);
-            delete item._data.RelatedMedias._medias;
+          if(item._data.RelatedMedias && item._data.PhotoFields) {
+            item._data.RelatedMedias._medias = [...item._data.PhotoFields._medias, ...item._data.RelatedMedias._medias];
+            delete item._data.PhotoFields._medias;
           }
           return Object.assign({}, ...Object.values(item._data));
         });
@@ -241,6 +241,7 @@
         this.set('more', true);
         this.computeService(this.projectId, this.more);
       }
+      
       canShowMore(loading, limit) {
         return !loading && !limit;
       }
