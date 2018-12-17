@@ -1,5 +1,6 @@
 <link rel="import" href="../../polymer/polymer-element.html">
 <link rel="import" href="../../iron-a11y-keys/iron-a11y-keys.html">
+<link rel="import" href="../../app-route/app-location.html">
 
 <link rel="import" href="../collectar-service/collectar-service.html">
 <link rel="import" href="../collectar-icons/collectar-icons.html">
@@ -72,6 +73,10 @@
           color: white;
       }
     </style>
+    <app-location
+      route="{{route}}"
+      url-space-regex="^[[rootPath]]">
+    </app-location>
     <collectar-service id="ajax" api="{{server}}" loading="{{loading}}"
       service="{{service}}" result="{{result}}" params="{{params}}"
       method="{{method}}" body="{{body}}" error="{{error}}">
@@ -139,8 +144,13 @@
             type: String
           },
           uniqueElements: Array,
-          disableTaxonomies: Boolean
+          disableTaxonomies: Boolean,
+          route: Object
         };
+      }
+
+      static get observers() {
+        return ['setInputValue(route.__queryParams.*)'];
       }
 
       connectedCallback() {
@@ -212,6 +222,11 @@
         if(!removeCandidate) return '';
         if (item._id === removeCandidate._id) return 'highlight';
         return '';
+      }
+
+      setInputValue(params) {
+        if(!params.base.search) return;
+        this.$.input.value = params.base.search;
       }
 
     }
