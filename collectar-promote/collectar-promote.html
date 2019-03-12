@@ -41,10 +41,18 @@
     <div class="promote-cover"></div>
     <p class="abstract">{{promote.abstract}}</p>
     <div class="body" inner-h-t-m-l="{{promote.body}}"></div>
+    <dom-if if="{{promote._items}}">
+      <template>
+        <fjm-detailed-list project-id="{{projectId}}"
+          server="{{server}}" query-only
+          query="{{buildItems(promote)}}">
+        </fjm-detailed-list>
+      </template>
+    </dom-if>
     <dom-if if="{{promote.filter}}">
       <template>
         <collectar-list project-id="{{projectId}}"
-          server="{{server}}" query-only
+          server="{{server}}" query-only  on-show-item="showItem"
           query="{{buildFilter(promote)}}">
         </collectar-list>
       </template>
@@ -104,6 +112,10 @@
         this.service = `promotes/${promoteId}`;
       }
 
+      showItem(e) {
+        this.dispatchEvent(new CustomEvent('show-item', { detail: e.detail }));
+      }
+
       generateRequest() {
         if (!this.service) return;
         this.$.ajax.generateRequest();
@@ -142,8 +154,17 @@
       }
 
       buildFilter(promote) {
-        if(!promote || !promote.filter) return undefined;
+        if(!promote || !promote.filter) return;
         return `?${promote.filter}&`;
+      }
+
+      buildItems(promote) {
+        if(!promote || !promote._items) return;
+        const filter = {
+          type: 'ids',
+          _item: promote._items
+        };
+        return `?filters=${JSON.stringify(filter)}&`;
       }
     }
 

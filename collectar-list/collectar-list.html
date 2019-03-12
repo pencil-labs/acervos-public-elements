@@ -178,9 +178,9 @@
       computeService(projectId, more) {
         this.service = undefined;
 
-        if (more) this.__skip = this.__skip  + 10 || 0;
+        if (more) this.__skip = this.__skip  + 25 || 0;
         let query = this.query || '?';
-        query += `skip=${this.__skip}&limit=10`;
+        query += `skip=${this.__skip}&limit=25`;
         if (!projectId) return;
         this.service = `projects/${projectId}/items${query}`;
       }
