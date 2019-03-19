@@ -1,11 +1,11 @@
 <link rel="import" href="../../polymer/polymer-element.html">
 <link rel="import" href="../../iron-image/iron-image.html">
-<link rel="import" href="../../app-layout/app-drawer-layout/app-drawer-layout.html">
-<link rel="import" href="../../app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../../paper-button/paper-button.html">
 <link rel="import" href="../../paper-spinner/paper-spinner-lite.html">
 <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../collectar-icons/collectar-icons.html">
+<link rel="import" href="../collectar-service/collectar-service.html">
+<link rel="import" href="../../app-layout/app-drawer/app-drawer.html">
 
 <dom-module id="collectar-card-show">
   <template>
@@ -13,30 +13,35 @@
       :host {
         --app-drawer-width: 300px;
         display: none;
-        position: absolute;
+        position: fixed;
         left: 0; right: 0;
         top: 0; bottom: 0;
         transition: ease 0.35s;
         opacity: 0;
         z-index: 999;
         overflow: auto;
-        background: white;
+        background: #333;
       }
       app-toolbar {
         z-index: 999;
       }
-      #drawerLayout {
-        min-height: calc(100% - 64px);
-        min-width: 100%;
-        background: white;
-        --app-drawer-layout-content-transition: margin 0.3s;
+      .drawer-content h3 {
+        color: var(--collectar-primary-color, #505050);
       }
-      .image {
-        height: calc(100vh - 120px);
+      .image,
+      .pdf {
+        height: calc(100vh - 60px);
         position: relative;
-        margin: 0 10px;
+        margin: 40px 10px 0;
         top: 0;
         transition: ease .3s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .pdf {
+        margin: 0;
+        height: 100vh;
       }
       iron-image {
         height: 100%;
@@ -65,63 +70,15 @@
       .data-wrapper {
         transition: ease .3s;
       }
+      #drawer {
+        z-index: 2;
+      }
       .drawer-content {
-        margin-top: 64px;
         padding: 0 20px 20px;
-        height: calc(100% - 84px);
+        height: calc(100% - 40px);
         overflow-y: auto;
         overflow-x: hidden;
         transition: opacity ease .35s;
-      }
-      .drawer-content .divider {
-        position: absolute;
-        right: 1px;
-        top: 280px;
-        height: 400px;
-        width: 1px;
-        background: #000;
-      }
-      .toggle {
-        transition: transform ease .3s;
-        transform: translateX(0);
-      }
-      .close.large-btn {
-        display: none;
-      }
-      .toggle.hidden {
-        transform: translateX(-100vw);
-      }
-      .show-light { color: var(--paper-grey-600); }
-      #drawerLayout,
-      .drawer-content,
-      app-toolbar {
-        transition: ease .3s;
-      }
-      #drawerLayout.dark,
-      .drawer-content.dark,
-      app-toolbar.dark {
-        background: #333;
-      }
-      #drawerLayout.dark .image {
-        height: calc(100vh - 70px);
-        top: -60px;
-      }
-      app-toolbar.dark {
-        background: transparent !important;
-      }
-      .navigate {
-        text-align: center;
-      }
-      .navigate .item {
-        padding: 12px;
-        height: 36px;
-        width: 30px;
-      }
-      .navigate .item.selected {
-        padding: 9px;
-      }
-      .dark .navigate {
-        color: white;
       }
       span.media {
         display: inline-block;
@@ -129,175 +86,161 @@
         overflow: hidden;
         max-width: 200px;
       }
+      #imgSpinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        --paper-spinner-color: white;
+      }
+      .btn {
+        z-index: 1;
+        border-radius: 50%;
+        width: 35px;
+        padding: 6px;
+        color: #505050;
+        height: 35px;
+        background-color: white;
+        position: absolute;
+      }
+      .close {
+        right: 20px;
+        top: 20px;
+      }
+      .download {
+        bottom: 8%;
+        left: 20px;
+        color: #505050;
+      }
+      .info {
+        bottom: 15%;
+        left: 20px;
+      }
+      .navigate {
+        border-radius: 50px;
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translate(-50%,0%);
+        color: var(--collectar-primary-color, #505050);
+        background-color: white;
+      }
+      .navigate .item {
+        padding: 0 12px;
+        height: 30px;
+        width: 28px;
+      }
+      .navigate .item.selected {
+        padding: 9px;
+      }
       .large-btn {
         display: inline-block;
       }
       .small-btn {
         display: none;
       }
-      #imgSpinner {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        --paper-spinner-color: black;
+      iframe {
+        border: none;
+        width: 100%;
+        height: 100%;
       }
-      .dark #imgSpinner {
-        --paper-spinner-color: white;
+      video {
+        width: 60vw;
       }
       @media screen and (max-width: 660px) {
-        :host {
-          background: #333 !important;
-        }
-        .close.large-btn {
-          display: inline-block;
-        }
-        .drawer-content,
-        app-toolbar {
-          transition: ease .3s;
-          background: transparent;
-        }
-        app-toolbar paper-icon-button {
-          color: black;
-        }
-        #drawerLayout,
-        #drawerLayout.dark {
-          background: #333;
-        }
-        #drawerLayout.dark .image {
-          height: calc(100vh - 120px);
-          top: 0;
-        }
-        .drawer-content.dark {
-          background: white;
-        }
-        app-toolbar.dark paper-icon-button {
-          color: white;
-        }
-        .toggle {
-          transform: translateX(0);
-        }
-        .toggle.hidden {
-          transform: translateX(0);
-        }
-        .toggle .show-header {
-          color: black;
-        }
-        .toggle.hidden .show-header {
-          color: white;
-        }
-        .show-header {
-          font-size: 1.5rem;
-        }
-        .navigate {
-          position: absolute;
-          color: white;
-          left: 0;
-          right: 0;
-        }
-        .large-btn {
+        .navigate .item {
           display: none;
         }
-        .small-btn {
-          display: inline-block;
+        video {
+          width: 90vw;
         }
       }
     </style>
     <collectar-service id="ajax" api="{{server}}" service="{{service}}"
       params="{{params}}" result="{{result}}"></collectar-service>
-    <app-toolbar>
-      <div middle-item class="toggle">
-        <div class="toolbar-buttons">
-          <paper-icon-button class="large-btn"  icon="app:close"
-            on-tap="dismiss"></paper-icon-button>
-          <paper-icon-button class="small-btn" icon="app:info"
-            on-tap="toggle"></paper-icon-button>
+    <app-drawer id="drawer" opened="{{drawerOpened}}">
+      <div class="drawer-content">
+        <h3>Obra</h3>
+        <div class="show-light">
+          Título: {{_validate(cardItem.name)}}
         </div>
-        <div class="show-header"><span>Informações</span></div>
-        <div class="toolbar-buttons">
-          <paper-icon-button class="close small-btn" icon="app:close"
-            on-tap="dismiss"></paper-icon-button>
+        <div class="show-light">
+          Autor: {{_validate(cardItem.author)}}
         </div>
+        <div class="show-light">
+          Local: {{_place(cardItem.place)}}
+        </div>
+        <div class="show-light">
+          Data: {{_date(cardItem.date)}}
+        </div>
+        <dom-if if={{cardItem.description}}>
+          <template>
+            <h3>Descrição</h3>
+            <div class="show-light">
+              {{_validate(cardItem.description)}}
+            </div>
+          </template>
+        </dom-if>
       </div>
-    </app-toolbar>
-    <app-drawer-layout id="drawerLayout">
-      <app-drawer slot="drawer" id="drawer" on-opened-changed="toggleColors">
-        <div class="drawer-content">
-          <div class="divider"></div>
-          <h3>Obra</h3>
-          <div class="show-light">
-            Título: {{_validate(cardItem.name)}}
+    </app-drawer>
+    <div class="data-wrapper">
+      <paper-icon-button class="btn close" icon="collectar:close"
+      on-tap="dismiss"></paper-icon-button>
+      <paper-icon-button class="btn info" icon="collectar:info-outline"
+      on-tap="toggle"></paper-icon-button>
+      <a href="{{cardItem.file.src}}" download="{{cardItem.file.originalname}}" target="_blank">
+        <paper-icon-button class="btn download" icon="collectar:download"></paper-icon-button>
+      </a>
+      <dom-if if="{{isImage(cardItem.file.mimetype)}}">
+        <template>
+          <div class="image">
+            <iron-image src="{{cardItem.file.src}}" sizing="contain"
+              loaded="{{imgLoaded}}">
+            </iron-image>
           </div>
-          <div class="show-light">
-            Técnica: {{_validate(cardItem.technique)}}
+        </template>
+      </dom-if>
+      <dom-if if="{{isPdf(cardItem.file.mimetype)}}">
+        <template>
+          <div class="pdf">
+            <iframe src="{{hidePdfBar(cardItem.file.src)}}" loaded="{{imgLoaded}}">
+            </iframe>
           </div>
-          <div class="show-light">
-            Dimensões: {{_unity(cardItem.dimensions)}}
+        </template>
+      </dom-if>
+      <dom-if if="{{isVideo(cardItem.file.mimetype)}}">
+        <template>
+          <div class="image">
+            <video controls>
+              <source src="{{cardItem.file.src}}" type="{{cardItem.file.mimetype}}">
+            </video>
           </div>
-          <div class="show-light">
-            Local: {{_validate(cardItem.place)}}
+        </template>
+      </dom-if>
+      <dom-if if="{{isAudio(cardItem.file.mimetype)}}">
+        <template>
+          <div class="image">
+            <audio controls>
+              <source src="{{cardItem.file.src}}" type="{{cardItem.file.mimetype}}">
+            </audio>
           </div>
-          <div class="show-light">
-            Data: {{_date(cardItem.date)}}
-          </div>
-          <h3>Descrição</h3>
-          <div class="show-light">
-            {{_validate(cardItem.description)}}
-          </div>
-          <h3>Midias Relacionadas</h3>
-          <div class="show-light">
-            <dom-repeat items="{{_medias(cardItem._files)}}">
-              <template>
-                <span class="media"><a href="{{_filepath(item)}}" target="_blanck">{{item.metadata.originalname}}</a></span>
-              </template>
-            </dom-repeat>
-            <dom-if if="{{noMedias}}">
-              <template>
-                Nenhuma midia anexada.
-              </template>
-            </dom-if>
-          </div>
-          <h3>Itens Relacionados</h3>
-          <div class="show-light">
-            <dom-repeat items="{{relatedItems}}">
-              <template>
-                <paper-button on-tap="changeItem">
-                  <img src="{{item.thumbnail}}"/>
-                </paper-button>
-              </template>
-            </dom-repeat>
-            <dom-if if="{{noRelated}}">
-              <template>
-                Nenhum item relacionado.
-              </template>
-            </dom-if>
-          </div>
-        </div>
-        <div class="card-toolbar-buttons">
-        </div>
-      </app-drawer>
-      <div class="data-wrapper">
-        <div class="image">
-          <iron-image src="{{cardItem.image}}" sizing="contain"
-            loaded="{{imgLoaded}}">
-          </iron-image>
-          <paper-spinner-lite id="imgSpinner" alt="Carregando imagem"
-            active style="display:none;"></paper-spinner-lite>
+        </template>
+      </dom-if>
+      <dom-if if="{{hideNavigate(cardItem._medias.length)}}">
+        <template>
           <div class="navigate">
-            <paper-icon-button class="prev" icon="app:chevron-left" on-tap="prevImage"></paper-icon-button>
+            <paper-icon-button class="prev" icon="collectar:chevron-left" on-tap="prevImage"></paper-icon-button>
             <dom-repeat items="{{cardItem._medias}}" as="media">
               <template>
                 <paper-icon-button class="item" noink
-                  icon="app:fiber-manual-record" on-tap="thisImage">
+                  icon="collectar:fiber-manual-record" on-tap="thisImage">
                 </paper-icon-button>
               </template>
             </dom-repeat>
-            <paper-icon-button class="next" icon="app:chevron-right" on-tap="nextImage"></paper-icon-button>
-            <paper-icon-button class="zoom large-btn" icon="app:zoom-in" on-tap="toggle"
-            autofocus></paper-icon-button>
+            <paper-icon-button class="next" icon="collectar:chevron-right" on-tap="nextImage"></paper-icon-button>
           </div>
-        </div>
-      </div>
-    </app-drawer-layout>
+        </template>
+      </dom-if>
+    </div>
   </template>
 
   <script>
@@ -309,7 +252,7 @@
      * @polymer
      * @demo demo/index.html
      */
-    class PublicElementsCardShow extends Polymer.Element {
+    class CollectarCardShow extends Polymer.Element {
       static get is() {
         return 'collectar-card-show';
       }
@@ -323,12 +266,8 @@
             type: String,
             observer: 'serviceChanged'
           },
-          projectId: {
-            value: '59801055c86b1e6a8bf6c36f'
-          },
-          server: {
-            value: 'http://localhost:4040/api'
-          },
+          projectId: String,
+          server: String,
           params: Object,
           relatedItems: Array,
           result: {
@@ -339,6 +278,9 @@
           },
           imgLoaded: {
             observer: 'imageLoaded'
+          },
+          drawerOpened: {
+            observer: 'drawerState'
           }
         };
       }
@@ -355,45 +297,33 @@
         this.currentImage = 0;
         this._relatedItems(this.cardItem._registers);
         this.style.display = 'block';
+        document.body.style.overflow = 'hidden';
         setTimeout(function() {
           this.style.opacity = '1';
         }.bind(this), 200);
       }
 
       toggle(e) {
-        const drawerLayout = this.$.drawerLayout;
-        if (drawerLayout.forceNarrow || !drawerLayout.narrow) {
-          drawerLayout.forceNarrow = !drawerLayout.forceNarrow;
-        } else {
-          drawerLayout.drawer.toggle();
-        }
-      }
-
-      toggleColors(e) {
-        const drawerLayout = this.$.drawerLayout;
-        this.shadowRoot.querySelector('.toggle').classList.toggle('hidden');
-        this.shadowRoot.querySelector('app-toolbar').classList.toggle('dark');
-        drawerLayout.classList.toggle('dark');
-        this.shadowRoot.querySelector('.drawer-content').classList.toggle('dark');
-        this.shadowRoot.querySelector('.close').classList.toggle('small-btn');
-        this.shadowRoot.querySelector('.close').classList.toggle('large-btn');
-        const zoom = this.shadowRoot.querySelector('.zoom');
-        if(zoom.icon === 'app:zoom-in') {
-          zoom.icon = 'app:zoom-out';
-          this.style.background = '#333';
-        } else {
-          zoom.icon = 'app:zoom-in';
-          this.style.background = '#fff';
-        }
+        this.$.drawer.toggle();
       }
 
       dismiss(e) {
+        this.reloadVideoAndAudio();
+        this.set('route.__queryParams', {});
         this.style.opacity = '0';
+        document.body.style.overflow = '';
         this.cardItem = undefined;
         setTimeout(function() {
           this.style.display = 'none';
         }.bind(this), 400);
         this.dispatchEvent(new CustomEvent('dismiss-show'));
+      }
+
+      reloadVideoAndAudio() {
+        const video = this.shadowRoot.querySelector('video');
+        if(video) video.load();
+        const audio = this.shadowRoot.querySelector('audio');
+        if(audio) audio.load();
       }
 
       showCard(cardItem) {
@@ -416,25 +346,24 @@
         // case when result is a list of items
         if (res.count) {
           this.relatedItems = res.results.map((item) => {
-            if(item._data.RelatedMedias) {
-              item._data.RelatedMedias._files = Array.from(item._data.RelatedMedias._medias);
-              delete item._data.RelatedMedias._medias;
+            if(item._data.RelatedMedias && item._data.PhotoFields) {
+              item._data.RelatedMedias._medias = [...item._data.PhotoFields._medias, ...item._data.RelatedMedias._medias];
+              delete item._data.PhotoFields._medias;
             }
             return Object.assign({}, ...Object.values(item._data));
           });
         } else if(res.register) {
-          console.log(res);
-          if(res._data.RelatedMedias) {
-            res._data.RelatedMedias._files = Array.from(res._data.RelatedMedias._medias);
-            delete res._data.RelatedMedias._medias;
+          if(res._data.RelatedMedias && res._data.PhotoFields) {
+            res._data.RelatedMedias._medias = [...res._data.PhotoFields._medias, ...res._data.RelatedMedias._medias];
+            delete res._data.PhotoFields._medias;
           }
           this.cardItem = Object.assign({}, ...Object.values(res._data));
         }
       }
 
       _imagePath(cardItem) {
-        if (!cardItem || !cardItem.image) return;
-        return cardItem.image;
+        if (!cardItem || !cardItem.file) return;
+        return cardItem.file;
       }
 
       _validate(prop) {
@@ -442,34 +371,27 @@
         return prop;
       }
 
-      _unity(dimensions) {
-        if(!dimensions) return 'Não informado.'
-        const frase = `${dimensions.width} x ${dimensions.height} `;
-        switch(dimensions.unity) {
-          case 'milimeter':
-            return frase + 'mm';
-          case 'centimeter':
-            return frase + 'cm';
-          case 'meter':
-            return frase + 'm';
+      _date(date) {
+        if(!date || !date.dates ||
+          !date.dateType || !date.dates[0]) return 'Não informada.';
+        let [, y, m, d] = date.dates[0].match(/(.*)-(.*)-(.*)T/);
+        switch(date.dateType) {
+          case 'fullDate':
+            return `${d}/${m}/${y}`;
+          case 'year':
+            return y;
+          case 'decades':
+            const [, y2, m2, d2] = date.dates[1].match(/(.*)-(.*)-(.*)T/);
+            return `${y} - ${y2}`;
           default:
-            return frase + 'cm';
+            return 'Não Informada.'
         }
       }
 
-      _date(date) {
-        if(!date || !date.dateType || !date[date.dateType]) return 'Não informado.'
-        switch(date.dateType) {
-          case 'fullDate':
-            let paths = date.fullDate.split('T')[0].split('-');
-            return `${paths[2]}/${paths[1]}/${paths[0]}`;
-          case 'decades':
-            return `${date.decades.from}-${date.decades.to}`;
-          case 'year':
-            return `${date.year}`;
-          default:
-            return 'Não informado';
-        }
+      _place(place) {
+        if(!place) return;
+        const paths = [place.country, place.state, place.city];
+        return paths.filter( i => !!i ).join('/');
       }
 
       _medias(medias) {
@@ -491,14 +413,14 @@
         const regs = registers.map((reg) => {
           return Number(reg.split('-')[1]);
         });
-        console.log(regs);
         this.params = { filters: JSON.stringify({ _register: regs }) };
         this.set('service', ``);
-        this.set('service', `projects/${this.projectId}/pubitems`);
+        this.set('service', `projects/${this.projectId}/items`);
       }
 
       _filepath(item) {
-        return `${this.cardItem.image.match(/(.*\/)/)[0]}${item.filename}`;
+        if(!this.cardItem.file) return;
+        return `${this.cardItem.file.src.match(/(.*\/)/)[0]}${item.filename}`;
       }
 
       changeItem(event) {
@@ -506,8 +428,8 @@
       }
 
       imageLoaded(loaded) {
-        if (loaded) this.$.imgSpinner.style.display = 'none';
-        else this.$.imgSpinner.style.display = 'block';
+        //if (loaded) this.$.imgSpinner.style.display = 'none';
+        // else this.$.imgSpinner.style.display = 'block';
       }
 
       _mediaPath(projectId, server, cardItem, currentImage) {
@@ -515,7 +437,10 @@
           !cardItem._medias || !cardItem._medias.length) return;
         this.mediaPath = `${server}/projects/${projectId}/medias/${
           this.cardItem._item}/${this.cardItem._medias[currentImage].filename}?size=1500`;
-        this.set('cardItem.image', this.mediaPath);
+        const mimetype = this.cardItem._medias[currentImage].metadata.mimetype;
+        const originalname = this.cardItem._medias[currentImage].metadata.originalname;
+        this.set('cardItem.file', {src: this.mediaPath, mimetype, originalname});
+        this.reloadVideoAndAudio();
         Array.from(this.shadowRoot.querySelectorAll('.navigate .item')).forEach((item, index) => {
           if(currentImage === index) {
             item.classList.add('selected');
@@ -538,8 +463,45 @@
         if(this.currentImage < this.cardItem._medias.length - 1) this.currentImage += 1;
       }
 
+      isImage(src) {
+        if(!src) return;
+        return src.match(/image/);
+      }
+
+      isPdf(src) {
+        if(!src) return;
+        return src.match(/pdf/i);
+      }
+
+      isVideo(src) {
+        if(!src) return;
+        return src.match(/video/i);
+      }
+
+      isAudio(src) {
+        if(!src) return;
+        return src.match(/audio/i);
+      }
+
+      drawerState(opened, oldOpened) {
+        if(!oldOpened) return;
+        setTimeout(function() {
+          document.body.style.overflow = 'hidden';
+        }.bind(this), 200);
+      }
+
+      hidePdfBar(src) {
+        return `${src}#toolbar=0`
+      }
+
+      hideNavigate(length) {
+        if(length > 1) return true;
+        return false;
+      }
+
     }
 
-    window.customElements.define(PublicElementsCardShow.is, PublicElementsCardShow);
+    window.customElements.define(CollectarCardShow.is, CollectarCardShow);
   </script>
 </dom-module>
+

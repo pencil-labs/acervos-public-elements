@@ -157,13 +157,13 @@
         const d1 = new Date(cardItem.date.dates[0]);
         const d2 = new Date(cardItem.date.dates[1]);
         switch(cardItem.date.dateType) {
-          case "decades":
-            return `${d1.getYear()} - ${d2.getYear()}`;
+          case 'decades':
+            return `${d1.getFullYear()} - ${d2.getFullYear()}`;
             break;
-          case "year":
-            return `${d1.getYear()}}`;
+          case 'year':
+            return `${d1.getFullYear()}`;
             break;
-          case "fullDate":
+          case 'fullDate':
             return `${d1.getDate()}/${d1.getMonth()}/${d1.getFullYear()}`;
             break;
         }

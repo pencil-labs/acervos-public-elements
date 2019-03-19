@@ -152,6 +152,8 @@
             observer: 'projectChanged'
           },
           queryOnly: Boolean,
+          infinite: Boolean,
+          scroller: Object,
           loading: {
             type: Boolean,
             value: false
@@ -164,15 +166,12 @@
         };
       }
 
+      static get observers() {
+        return ['setupScrollListener(scroller, infinite)'];
+      }
+
       connectedCallback() {
         super.connectedCallback();
-        this.onscroll = function(e) {
-          const moreOffset = this.$.results.querySelector('.show-more').offsetTop;
-          const scrollTop  = e.target.scrollTop + e.target.clientHeight;
-          if(scrollTop >= moreOffset && !this.more) {
-            this._loadMore();
-          }
-        }.bind(this);
       }
 
       computeService(projectId, more) {
@@ -227,15 +226,6 @@
         this.$.ajax.generateRequest();
       }
 
-      presentShow(e) {
-        this.dispatchEvent(new CustomEvent('show', { detail: { item: e.detail.cardItem },
-          bubbles: true, composed: true }));
-      }
-
-      dismissShow(e) {
-        this.$.show.cardItem = undefined;
-      }
-
       _loadMore(e) {
         if(!this.resultItems.length) return;
         this.set('more', true);
@@ -244,6 +234,18 @@
       
       canShowMore(loading, limit) {
         return !loading && !limit;
+      }
+
+      setupScrollListener(scroller, infinite) {
+        if (infinite) {
+          scroller.onscroll = function(e) {
+            const moreOffset = this.$.results.querySelector('.show-more').offsetTop;
+            const scrollTop  = window.scrollY + 1.2*screen.height;
+            if(scrollTop >= moreOffset && !this.more) {
+              this._loadMore();
+            }
+          }.bind(this);
+        }
       }
     }
 
