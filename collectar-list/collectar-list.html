@@ -94,6 +94,11 @@
       <grain-masonry id="masonry" transition-duration="250" item-selector="collectar-card">
       </grain-masonry>
       <div class="show-more">
+        <dom-if if="{{_noResults(loading)}}">
+          <template>
+            <p>A busca não retornou resultados.</p>
+          </template>
+        </dom-if>
         <dom-if if="{{loading}}">
           <template>
             <div class="spinner">
@@ -246,6 +251,9 @@
             }
           }.bind(this);
         }
+      }
+      _noResults(loading) {
+        return !this.resultItems.length && !loading;
       }
     }
 

@@ -76,6 +76,8 @@
         background: white;
         margin: 5px 2px;
         line-height: 1.2rem;
+        font-weight: 400;
+        vertical-align: bottom;
       }
       .taxonomies span.highlight {
         background: var(--pink-theme-color);
@@ -100,12 +102,12 @@
           </template>
         </dom-repeat>
       </div>
-      <input id="input" placeholder="Buscar..." value="{{search::input}}">
       <paper-autocomplete-suggestions for="input" id="complete"
         remote-source text-property="name" value-property="id"
         min-length="3" on-autocomplete-change="searchTaxonomy"
         on-autocomplete-selected="selectTaxonomy">
-       ></paper-autocomplete-suggestions>
+       </paper-autocomplete-suggestions>
+      <input id="input" placeholder="Buscar..." value="{{search::input}}">
       <paper-icon-button class="search" icon="collectar:search" on-tap="searchFor">
       </paper-icon-button>
       <iron-a11y-keys target="[[target]]" keys="backspace"
@@ -139,9 +141,6 @@
           result: {
             type: Object,
             observer: 'handleResult'
-          },
-          search: {
-            type: String,
           },
           filter: {
             type: Object,
@@ -227,6 +226,7 @@
       }
 
       onBackspace(e) {
+        this.filterResult = [];
         if(this.search || !this.taxonomies.length) return;
         const lastIndex = this.taxonomies.length - 1;
         if (this.removeCandidate) {

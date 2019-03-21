@@ -15,12 +15,13 @@
         display: none;
         position: fixed;
         left: 0; right: 0;
-        top: 0; bottom: 0;
+        top: 0; bottom: -140px;
         transition: ease 0.35s;
         opacity: 0;
         z-index: 999;
-        overflow: auto;
+        overflow: hidden;
         background: #333;
+        transform: translateY(-70px);
       }
       app-toolbar {
         z-index: 999;
@@ -69,13 +70,17 @@
       }
       .data-wrapper {
         transition: ease .3s;
+        position: relative;
+        top: 30px;
+        height: 100vh;
       }
       #drawer {
         z-index: 2;
+        transform: translateY(70px);
       }
       .drawer-content {
         padding: 0 20px 20px;
-        height: calc(100% - 40px);
+        height: calc(100% - 160px);
         overflow-y: auto;
         overflow-x: hidden;
         transition: opacity ease .35s;
@@ -107,18 +112,18 @@
         top: 20px;
       }
       .download {
-        bottom: 8%;
+        bottom: 25px;
         left: 20px;
         color: #505050;
       }
       .info {
-        bottom: 15%;
+        bottom: 75px;
         left: 20px;
       }
       .navigate {
         border-radius: 50px;
         position: absolute;
-        bottom: 10px;
+        bottom: 20px;
         left: 50%;
         transform: translate(-50%,0%);
         color: var(--collectar-primary-color, #505050);
@@ -311,10 +316,10 @@
         this.reloadVideoAndAudio();
         this.set('route.__queryParams', {});
         this.style.opacity = '0';
-        document.body.style.overflow = '';
-        this.cardItem = undefined;
         setTimeout(function() {
+          document.body.style.overflow = '';
           this.style.display = 'none';
+          this.cardItem = undefined;
         }.bind(this), 400);
         this.dispatchEvent(new CustomEvent('dismiss-show'));
       }
