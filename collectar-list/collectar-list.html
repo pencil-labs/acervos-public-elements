@@ -190,7 +190,11 @@
       }
 
       animateItems(result) {
-        if(!result || !result.results.length) return;
+        if (!result || !result.results.length) {
+          this.limit = true;
+          this.set('more', false);
+          return;
+        }
         this.limit = false;
         const resultItems = result.results.map((item) => {
           if(item._data.RelatedMedias && item._data.PhotoFields) {
@@ -238,18 +242,21 @@
       }
       
       canShowMore(loading, limit) {
-        return !loading && !limit;
+        return !limit && this._noResults(loading);
       }
 
       setupScrollListener(scroller, infinite) {
         if (infinite) {
-          scroller.onscroll = function(e) {
-            const moreOffset = this.$.results.querySelector('.show-more').offsetTop;
-            const scrollTop  = window.scrollY + 1.2*screen.height;
-            if(scrollTop >= moreOffset && !this.more) {
-              this._loadMore();
-            }
-          }.bind(this);
+          if (!scroller) return;
+          scroller.onscroll = this.scrollFunc.bind(this);
+        }
+      }
+      scrollFunc(e) {
+        if (!this.infinite) return;
+        const moreOffset = this.$.results.querySelector('.show-more').offsetTop;
+        const scrollTop  = window.scrollY + 1.2*screen.height;
+        if(scrollTop >= moreOffset && !this.more) {
+          this._loadMore();
         }
       }
       _noResults(loading) {
