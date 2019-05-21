@@ -11,11 +11,13 @@
         display: none;
         position: absolute;
         top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         background: white;
         overflow: hidden;
         padding: 0 20px;
         opacity: 0;
-        width: 100%;
         transition: opacity ease .35s;
       }
       h1 paper-icon-button {
@@ -43,10 +45,10 @@
     <div class="body" inner-h-t-m-l="{{promote.body}}"></div>
     <dom-if if="{{promote._items}}">
       <template>
-        <fjm-detailed-list project-id="{{projectId}}"
-          server="{{server}}" query-only
-          query="{{buildItems(promote)}}">
-        </fjm-detailed-list>
+        <collectar-list project-id="{{projectId}}"
+          server="{{server}}" query-only  on-show-item="showItem"
+          query="{{buildFilter(promote)}}">
+        </collectar-list>
       </template>
     </dom-if>
     <dom-if if="{{promote.filter}}">
@@ -135,12 +137,15 @@
 
       animate(promote) {
         if(promote) {
+          this.__bodyOverflow = document.body.style.overflow;
+          document.body.style.overflow = 'hidden';
           this.style.display = 'block';
           this.style.overflow = 'auto';
           setTimeout(() => {
             this.style.opacity = '1';
           }, 10);
         } else {
+          document.body.style.overflow = this.__bodyOverflow;
           this.style.opacity = '0';
           setTimeout(() => {
             this.style.display = 'none';
