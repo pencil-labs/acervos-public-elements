@@ -19,6 +19,9 @@
         overflow-y: auto;
         height: 100%;
         width: 100%;
+        --collectar-card: {
+          width: calc(25% - 20px);
+        };
       }
       .show-less, .show-more {
         text-align: center;
@@ -64,24 +67,32 @@
         width: calc(100% + 20px);
         margin-left: -10px;
       }
-      @media screen and (max-width: 1201px) {
-        collectar-card {
-          width: calc(33.333333333% - 20px);
+      @media screen and (max-width: 1401px) {
+        :host {
+          --collectar-card: {
+            width: calc(25% - 20px);
+          };
         }
       }
       @media screen and (max-width: 961px) {
-        collectar-card {
-          width: calc(33.333333333% - 20px);
+        :host {
+          --collectar-card: {
+            width: calc(33.333333333% - 20px);
+          };
         }
       }
       @media screen and (max-width: 718px) {
-        collectar-card {
-          width: calc(50% - 20px);
+        :host {
+          --collectar-card: {
+            width: calc(50% - 20px);
+          };
         }
       }
       @media screen and (max-width: 480px) {
-        collectar-card {
-          width: calc(100% - 20px);
+        :host {
+          --collectar-card: {
+            width: calc(100% - 20px);
+          };
         }
       }
     </style>
