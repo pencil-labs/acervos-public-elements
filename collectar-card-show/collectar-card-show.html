@@ -302,6 +302,7 @@
         this.currentImage = 0;
         this._relatedItems(this.cardItem._registers);
         this.style.display = 'block';
+        this.__bodyOverflow = document.body.style.overflow;
         document.body.style.overflow = 'hidden';
         setTimeout(function() {
           this.style.opacity = '1';
@@ -317,7 +318,7 @@
         this.set('route.__queryParams', {});
         this.style.opacity = '0';
         setTimeout(function() {
-          document.body.style.overflow = '';
+          document.body.style.overflow = this.__bodyOverflow;
           this.style.display = 'none';
           this.cardItem = undefined;
         }.bind(this), 400);
